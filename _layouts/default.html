@@ -9,21 +9,19 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg-deep: #050a18;
-      --bg-mid: #0a1628;
-      --bg-surface: rgba(255, 255, 255, 0.04);
-      --bg-surface-hover: rgba(255, 255, 255, 0.07);
-      --border-subtle: rgba(100, 180, 255, 0.1);
-      --border-hover: rgba(100, 180, 255, 0.25);
-      --text-primary: #e0e8f0;
-      --text-secondary: #8899aa;
-      --text-muted: #5a6a7a;
-      --accent-cyan: #00c8ff;
-      --accent-cyan-dim: rgba(0, 200, 255, 0.15);
-      --accent-violet: #8b7cf7;
-      --accent-violet-dim: rgba(139, 124, 247, 0.12);
-      --glow-cyan: 0 0 20px rgba(0, 200, 255, 0.15);
-      --glow-violet: 0 0 20px rgba(139, 124, 247, 0.12);
+      --bg-deep: #000000;
+      --bg-mid: #0a0a0a;
+      --bg-surface: rgba(255, 255, 255, 0.06);
+      --bg-surface-hover: rgba(255, 255, 255, 0.10);
+      --border-subtle: rgba(255, 255, 255, 0.12);
+      --border-hover: rgba(255, 255, 255, 0.25);
+      --text-primary: #f0f0f0;
+      --text-secondary: #999999;
+      --text-muted: #666666;
+      --accent-primary: #ffffff;
+      --accent-secondary: #cccccc;
+      --accent-dim: rgba(255, 255, 255, 0.08);
+      --glow-soft: 0 0 20px rgba(255, 255, 255, 0.08);
     }
 
     body {
@@ -53,12 +51,12 @@
       flex-direction: column;
     }
 
-    a { color: var(--accent-cyan); text-decoration: none; transition: color 0.3s; }
-    a:hover { color: #60dcff; text-decoration: none; }
+    a { color: rgba(255, 255, 255, 0.7); text-decoration: none; transition: color 0.3s; }
+    a:hover { color: #ffffff; text-decoration: none; }
 
     .site-header {
       border-bottom: 1px solid var(--border-subtle);
-      background: rgba(5, 10, 24, 0.8);
+      background: rgba(0, 0, 0, 0.5);
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
       padding: 1rem 0;
@@ -74,12 +72,8 @@
     .site-title {
       font-size: 1.25rem;
       font-weight: 700;
-      color: var(--text-primary);
+      color: #ffffff;
       letter-spacing: 0.02em;
-      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-violet));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
     }
     .site-nav a {
       margin-left: 1.5rem;
@@ -87,7 +81,7 @@
       font-size: 0.9rem;
       transition: color 0.3s;
     }
-    .site-nav a:hover { color: var(--accent-cyan); }
+    .site-nav a:hover { color: #ffffff; }
 
     .wrapper {
       max-width: 800px;
@@ -106,7 +100,7 @@
       text-align: center;
       color: var(--text-muted);
       font-size: 0.85rem;
-      background: rgba(5, 10, 24, 0.6);
+      background: rgba(0, 0, 0, 0.5);
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
     }
@@ -116,11 +110,7 @@
       font-size: 1.8rem;
       margin: 2rem 0 1rem;
       font-weight: 700;
-      color: var(--text-primary);
-      background: linear-gradient(135deg, #fff, var(--accent-cyan));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+      color: #ffffff;
     }
     .markdown-body h2 {
       font-size: 1.4rem;
@@ -138,23 +128,23 @@
     .markdown-body ul, .markdown-body ol { margin: 0.8rem 0; padding-left: 2rem; }
     .markdown-body li { margin: 0.3rem 0; }
     .markdown-body blockquote {
-      border-left: 3px solid var(--accent-violet);
+      border-left: 3px solid rgba(255, 255, 255, 0.3);
       padding: 0.5rem 1rem;
       margin: 1rem 0;
       color: var(--text-secondary);
-      background: var(--accent-violet-dim);
+      background: var(--accent-dim);
       border-radius: 0 6px 6px 0;
     }
     .markdown-body code {
-      background: rgba(0, 200, 255, 0.08);
+      background: rgba(255, 255, 255, 0.08);
       padding: 0.15rem 0.4rem;
       border-radius: 3px;
       font-size: 0.9em;
-      color: var(--accent-cyan);
-      border: 1px solid rgba(0, 200, 255, 0.12);
+      color: var(--accent-secondary);
+      border: 1px solid rgba(255, 255, 255, 0.1);
     }
     .markdown-body pre {
-      background: rgba(10, 22, 40, 0.8);
+      background: rgba(0, 0, 0, 0.5);
       border: 1px solid var(--border-subtle);
       padding: 1rem;
       border-radius: 8px;
@@ -192,7 +182,7 @@
     .markdown-body th {
       background: var(--bg-surface);
       font-weight: 600;
-      color: var(--accent-cyan);
+      color: #ffffff;
     }
 
     /* Contributor cards */
@@ -218,24 +208,24 @@
       top: 0;
       left: 0;
       right: 0;
-      height: 2px;
-      background: linear-gradient(90deg, transparent, var(--accent-cyan), var(--accent-violet), transparent);
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
       opacity: 0;
       transition: opacity 0.4s;
     }
     .contributor-card:hover {
       border-color: var(--border-hover);
-      box-shadow: var(--glow-cyan), inset 0 0 30px rgba(0, 200, 255, 0.02);
+      box-shadow: var(--glow-soft);
       background: var(--bg-surface-hover);
     }
     .contributor-card:hover::before { opacity: 1; }
     .contributor-card h3 { margin: 0 0 0.4rem; font-size: 1.15rem; }
     .contributor-card h3 a { color: var(--text-primary); transition: color 0.3s; }
-    .contributor-card h3 a:hover { color: var(--accent-cyan); }
+    .contributor-card h3 a:hover { color: #ffffff; }
     .contributor-card .quote { color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 0.6rem; }
     .contributor-card .meta { color: var(--text-muted); font-size: 0.8rem; }
     .contributor-card .meta a { color: var(--text-muted); }
-    .contributor-card .meta a:hover { color: var(--accent-cyan); }
+    .contributor-card .meta a:hover { color: #ffffff; }
 
     /* Page header */
     .page-header {
@@ -249,7 +239,7 @@
       color: var(--text-secondary);
       transition: color 0.3s;
     }
-    .github-link:hover { color: var(--accent-cyan); text-decoration: none; }
+    .github-link:hover { color: #ffffff; text-decoration: none; }
 
     /* Breadcrumb */
     .breadcrumb {
@@ -257,7 +247,7 @@
       color: var(--text-muted);
     }
     .breadcrumb a { color: var(--text-secondary); }
-    .breadcrumb a:hover { color: var(--accent-cyan); }
+    .breadcrumb a:hover { color: #ffffff; }
 
     /* Hero */
     .hero {
@@ -269,10 +259,7 @@
       font-size: 2.4rem;
       margin-bottom: 0.8rem;
       font-weight: 800;
-      background: linear-gradient(135deg, #fff 0%, var(--accent-cyan) 50%, var(--accent-violet) 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+      color: #ffffff;
       letter-spacing: -0.02em;
     }
     .hero .tagline {
@@ -285,17 +272,17 @@
       display: inline-block;
       margin-top: 1.5rem;
       padding: 0.7rem 2rem;
-      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-violet));
-      color: #fff;
+      background: #ffffff;
+      color: #000000;
       border-radius: 8px;
       font-size: 0.95rem;
       font-weight: 600;
-      transition: all 0.3s;
-      box-shadow: 0 4px 20px rgba(0, 200, 255, 0.2);
+      transition: box-shadow 0.3s, opacity 0.3s;
       letter-spacing: 0.02em;
     }
     .hero .cta:hover {
-      box-shadow: 0 6px 30px rgba(0, 200, 255, 0.35);
+      box-shadow: 0 4px 20px rgba(255, 255, 255, 0.2);
+      color: #000000;
       text-decoration: none;
     }
 
@@ -308,15 +295,15 @@
 
     /* Links inside markdown content */
     .markdown-body a {
-      color: var(--accent-cyan);
+      color: rgba(255, 255, 255, 0.7);
       text-decoration: underline;
-      text-decoration-color: rgba(0, 200, 255, 0.3);
+      text-decoration-color: rgba(255, 255, 255, 0.2);
       text-underline-offset: 2px;
       transition: color 0.3s, text-decoration-color 0.3s;
     }
     .markdown-body a:hover {
-      color: #60dcff;
-      text-decoration-color: rgba(96, 220, 255, 0.6);
+      color: #ffffff;
+      text-decoration-color: rgba(255, 255, 255, 0.5);
     }
 
     /* Post list in contributor page */
@@ -333,15 +320,15 @@
     }
     .post-list li:last-child { border-bottom: none; }
     .post-list li a {
-      color: var(--accent-cyan);
+      color: rgba(255, 255, 255, 0.7);
       text-decoration: underline;
-      text-decoration-color: rgba(0, 200, 255, 0.3);
+      text-decoration-color: rgba(255, 255, 255, 0.2);
       text-underline-offset: 2px;
       transition: color 0.3s, text-decoration-color 0.3s;
     }
     .post-list li a:hover {
-      color: #60dcff;
-      text-decoration-color: rgba(96, 220, 255, 0.6);
+      color: #ffffff;
+      text-decoration-color: rgba(255, 255, 255, 0.5);
     }
     .post-list .post-date {
       color: var(--text-muted);
@@ -372,6 +359,8 @@
       border: 1px solid var(--border-subtle);
       border-radius: 10px;
       padding: 1.2rem 1.2rem 1rem;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
     }
     .promote-text {
       font-family: inherit;
@@ -388,8 +377,8 @@
     .copy-btn {
       margin-top: 1rem;
       padding: 0.4rem 1.2rem;
-      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-violet));
-      color: #fff;
+      background: #ffffff;
+      color: #000000;
       border: none;
       border-radius: 6px;
       font-size: 0.85rem;
@@ -399,7 +388,7 @@
       letter-spacing: 0.02em;
     }
     .copy-btn:hover {
-      box-shadow: 0 4px 16px rgba(0, 200, 255, 0.3);
+      box-shadow: 0 4px 16px rgba(255, 255, 255, 0.15);
     }
 
     /* Language toggle */
@@ -410,11 +399,11 @@
       transition: color 0.3s;
       user-select: none;
     }
-    .lang-toggle:hover { color: var(--accent-cyan); }
+    .lang-toggle:hover { color: #ffffff; }
 
     /* Selection color */
     ::selection {
-      background: rgba(0, 200, 255, 0.25);
+      background: rgba(255, 255, 255, 0.2);
       color: #fff;
     }
 
@@ -422,14 +411,14 @@
     ::-webkit-scrollbar { width: 6px; }
     ::-webkit-scrollbar-track { background: var(--bg-deep); }
     ::-webkit-scrollbar-thumb {
-      background: rgba(100, 180, 255, 0.2);
+      background: rgba(255, 255, 255, 0.15);
       border-radius: 3px;
     }
-    ::-webkit-scrollbar-thumb:hover { background: rgba(100, 180, 255, 0.35); }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.3); }
   </style>
 </head>
 <body>
-  <canvas id="cosmos-canvas"></canvas>
+  <div id="cosmos-canvas"></div>
 
   <div class="page-shell">
     <header class="site-header">
@@ -531,170 +520,180 @@
   </script>
   <script>
   (function () {
-    var canvas = document.getElementById('cosmos-canvas');
-    if (!canvas) return;
-    var ctx = canvas.getContext('2d');
-    var w, h, particles, streams, mouse, raf;
+    var container = document.getElementById('cosmos-canvas');
+    if (!container) return;
 
-    mouse = { x: -9999, y: -9999 };
+    var vertSrc = [
+      'attribute vec2 position;',
+      'varying vec2 vUv;',
+      'void main() {',
+      '  vUv = position * 0.5 + 0.5;',
+      '  gl_Position = vec4(position, 0.0, 1.0);',
+      '}'
+    ].join('\n');
+
+    var fragSrc = [
+      'precision highp float;',
+      'uniform float uTime;',
+      'uniform vec3 uResolution;',
+      'uniform vec2 uMouse;',
+      'uniform float uMouseActive;',
+      'varying vec2 vUv;',
+      '',
+      '#define NUM_LAYER 4.0',
+      '#define MAT45 mat2(0.7071, -0.7071, 0.7071, 0.7071)',
+      '',
+      'float Hash21(vec2 p) {',
+      '  p = fract(p * vec2(123.34, 456.21));',
+      '  p += dot(p, p + 45.32);',
+      '  return fract(p.x * p.y);',
+      '}',
+      '',
+      'float tri(float x) {',
+      '  return abs(fract(x) * 2.0 - 1.0);',
+      '}',
+      '',
+      'float tris(float x) {',
+      '  return 1.0 - smoothstep(0.0, 1.0, abs(2.0 * fract(x) - 1.0));',
+      '}',
+      '',
+      'float trisn(float x) {',
+      '  return 2.0 * (1.0 - smoothstep(0.0, 1.0, abs(2.0 * fract(x) - 1.0))) - 1.0;',
+      '}',
+      '',
+      'float Star(vec2 uv, float flare) {',
+      '  float d = length(uv);',
+      '  float m = 0.02 / d;',
+      '  float rays = smoothstep(0.0, 1.0, 1.0 - abs(uv.x * uv.y * 1000.0));',
+      '  m += rays * flare * 0.35;',
+      '  uv *= MAT45;',
+      '  rays = smoothstep(0.0, 1.0, 1.0 - abs(uv.x * uv.y * 1000.0));',
+      '  m += rays * 0.1 * flare;',
+      '  m *= smoothstep(1.0, 0.2, d);',
+      '  return m;',
+      '}',
+      '',
+      'vec3 StarLayer(vec2 uv) {',
+      '  vec3 col = vec3(0.0);',
+      '  vec2 gv = fract(uv) - 0.5;',
+      '  vec2 id = floor(uv);',
+      '  for (int y = -1; y <= 1; y++) {',
+      '    for (int x = -1; x <= 1; x++) {',
+      '      vec2 offset = vec2(float(x), float(y));',
+      '      vec2 si = id + offset;',
+      '      float seed = Hash21(si);',
+      '      float size = fract(seed * 345.32);',
+      '      float glossLocal = tri(uTime * 0.03 / (3.0 * seed + 1.0));',
+      '      float flareSize = smoothstep(0.9, 1.0, size) * glossLocal;',
+      '      float bright = 0.7 + 0.3 * Hash21(si + 1.0);',
+      '      float temp = Hash21(si + 2.0);',
+      '      vec3 base = mix(vec3(0.8, 0.85, 1.0), vec3(1.0, 0.95, 0.85), temp);',
+      '      base *= bright;',
+      '      vec2 pad = vec2(',
+      '        tris(seed * 34.0 + uTime * 0.03),',
+      '        tris(seed * 38.0 + uTime * 0.01)',
+      '      ) - 0.5;',
+      '      float star = Star(gv - offset - pad, flareSize);',
+      '      float twinkle = trisn(uTime * 0.3 + seed * 6.2831) * 0.5 + 1.0;',
+      '      twinkle = mix(1.0, twinkle, 0.4);',
+      '      star *= twinkle;',
+      '      col += star * size * base;',
+      '    }',
+      '  }',
+      '  return col;',
+      '}',
+      '',
+      'void main() {',
+      '  vec2 uv = (vUv * uResolution.xy - 0.5 * uResolution.xy) / uResolution.y;',
+      '  vec2 mouseOffset = (uMouse - vec2(0.5)) * 0.08 * uMouseActive;',
+      '  uv += mouseOffset;',
+      '  float angle = uTime * 0.03;',
+      '  mat2 rot = mat2(cos(angle), -sin(angle), sin(angle), cos(angle));',
+      '  uv = rot * uv;',
+      '  vec3 col = vec3(0.0);',
+      '  for (float i = 0.0; i < 1.0; i += 1.0 / NUM_LAYER) {',
+      '    float depth = fract(i + uTime * 0.03);',
+      '    float scale = mix(20.0, 0.5, depth);',
+      '    float fade = depth * smoothstep(1.0, 0.9, depth);',
+      '    col += StarLayer(uv * scale + i * 453.32) * fade;',
+      '  }',
+      '  gl_FragColor = vec4(col, 1.0);',
+      '}'
+    ].join('\n');
+
+    var canvas = document.createElement('canvas');
+    canvas.style.cssText = 'width:100%;height:100%;display:block';
+    container.appendChild(canvas);
+
+    var gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+    if (!gl) return;
+
+    function compile(type, src) {
+      var s = gl.createShader(type);
+      gl.shaderSource(s, src);
+      gl.compileShader(s);
+      return s;
+    }
+
+    var prog = gl.createProgram();
+    gl.attachShader(prog, compile(gl.VERTEX_SHADER, vertSrc));
+    gl.attachShader(prog, compile(gl.FRAGMENT_SHADER, fragSrc));
+    gl.linkProgram(prog);
+    gl.useProgram(prog);
+
+    var buf = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 3,-1, -1,3]), gl.STATIC_DRAW);
+
+    var pos = gl.getAttribLocation(prog, 'position');
+    gl.enableVertexAttribArray(pos);
+    gl.vertexAttribPointer(pos, 2, gl.FLOAT, false, 0, 0);
+
+    var uTime = gl.getUniformLocation(prog, 'uTime');
+    var uRes = gl.getUniformLocation(prog, 'uResolution');
+    var uMouse = gl.getUniformLocation(prog, 'uMouse');
+    var uMouseActive = gl.getUniformLocation(prog, 'uMouseActive');
+
+    var mouse = { x: 0.5, y: 0.5 }, target = { x: 0.5, y: 0.5 }, active = 0, activeTarget = 0;
 
     function resize() {
-      w = canvas.width = window.innerWidth;
-      h = canvas.height = window.innerHeight;
+      var dpr = Math.min(window.devicePixelRatio || 1, 2);
+      var w = container.offsetWidth, h = container.offsetHeight;
+      canvas.width = w * dpr;
+      canvas.height = h * dpr;
+      gl.viewport(0, 0, canvas.width, canvas.height);
     }
 
-    function createParticles() {
-      var count = Math.min(Math.floor(w * h / 6000), 260);
-      particles = [];
-      for (var i = 0; i < count; i++) {
-        particles.push({
-          x: Math.random() * w,
-          y: Math.random() * h,
-          r: Math.random() * 1.4 + 0.3,
-          dx: (Math.random() - 0.5) * 0.15,
-          dy: (Math.random() - 0.5) * 0.15,
-          opacity: Math.random() * 0.6 + 0.2,
-          pulse: Math.random() * Math.PI * 2,
-          pulseSpeed: Math.random() * 0.008 + 0.003,
-          hue: Math.random() > 0.65 ? 260 : 195
-        });
-      }
-    }
-
-    function createStreams() {
-      streams = [];
-      var streamCount = Math.min(Math.floor(w / 200), 5);
-      for (var i = 0; i < streamCount; i++) {
-        streams.push({
-          x: Math.random() * w,
-          y: Math.random() * h,
-          length: Math.random() * 120 + 60,
-          speed: Math.random() * 0.4 + 0.2,
-          angle: Math.random() * Math.PI * 2,
-          angleSpeed: (Math.random() - 0.5) * 0.003,
-          opacity: Math.random() * 0.06 + 0.02,
-          hue: Math.random() > 0.5 ? 195 : 260
-        });
-      }
-    }
-
-    function drawParticle(p) {
-      p.pulse += p.pulseSpeed;
-      var alpha = p.opacity * (0.7 + 0.3 * Math.sin(p.pulse));
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-      ctx.fillStyle = 'hsla(' + p.hue + ', 80%, 70%, ' + alpha + ')';
-      ctx.fill();
-
-      if (p.r > 1) {
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.r * 3, 0, Math.PI * 2);
-        ctx.fillStyle = 'hsla(' + p.hue + ', 80%, 70%, ' + (alpha * 0.1) + ')';
-        ctx.fill();
-      }
-    }
-
-    function drawStream(s) {
-      s.x += Math.cos(s.angle) * s.speed;
-      s.y += Math.sin(s.angle) * s.speed;
-      s.angle += s.angleSpeed;
-
-      if (s.x < -s.length) s.x = w + s.length;
-      if (s.x > w + s.length) s.x = -s.length;
-      if (s.y < -s.length) s.y = h + s.length;
-      if (s.y > h + s.length) s.y = -s.length;
-
-      var ex = s.x + Math.cos(s.angle) * s.length;
-      var ey = s.y + Math.sin(s.angle) * s.length;
-
-      var grad = ctx.createLinearGradient(s.x, s.y, ex, ey);
-      grad.addColorStop(0, 'hsla(' + s.hue + ', 80%, 60%, 0)');
-      grad.addColorStop(0.5, 'hsla(' + s.hue + ', 80%, 60%, ' + s.opacity + ')');
-      grad.addColorStop(1, 'hsla(' + s.hue + ', 80%, 60%, 0)');
-
-      ctx.beginPath();
-      ctx.moveTo(s.x, s.y);
-      ctx.lineTo(ex, ey);
-      ctx.strokeStyle = grad;
-      ctx.lineWidth = 1;
-      ctx.stroke();
-    }
-
-    function drawConnections() {
-      var maxDist = 100;
-      for (var i = 0; i < particles.length; i++) {
-        for (var j = i + 1; j < particles.length; j++) {
-          var dx = particles[i].x - particles[j].x;
-          var dy = particles[i].y - particles[j].y;
-          var dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist < maxDist) {
-            var alpha = (1 - dist / maxDist) * 0.08;
-            ctx.beginPath();
-            ctx.moveTo(particles[i].x, particles[i].y);
-            ctx.lineTo(particles[j].x, particles[j].y);
-            ctx.strokeStyle = 'rgba(100, 200, 255, ' + alpha + ')';
-            ctx.lineWidth = 0.5;
-            ctx.stroke();
-          }
-        }
-      }
-    }
-
-    function drawMouseGlow() {
-      if (mouse.x < 0) return;
-      var grad = ctx.createRadialGradient(mouse.x, mouse.y, 0, mouse.x, mouse.y, 150);
-      grad.addColorStop(0, 'rgba(0, 200, 255, 0.03)');
-      grad.addColorStop(1, 'rgba(0, 200, 255, 0)');
-      ctx.fillStyle = grad;
-      ctx.fillRect(mouse.x - 150, mouse.y - 150, 300, 300);
-    }
-
-    function tick() {
-      ctx.clearRect(0, 0, w, h);
-
-      for (var i = 0; i < streams.length; i++) drawStream(streams[i]);
-
-      for (var i = 0; i < particles.length; i++) {
-        var p = particles[i];
-        p.x += p.dx;
-        p.y += p.dy;
-        if (p.x < 0) p.x = w;
-        if (p.x > w) p.x = 0;
-        if (p.y < 0) p.y = h;
-        if (p.y > h) p.y = 0;
-        drawParticle(p);
-      }
-
-      drawConnections();
-      drawMouseGlow();
-
-      raf = requestAnimationFrame(tick);
-    }
-
-    function init() {
-      resize();
-      createParticles();
-      createStreams();
-      tick();
-    }
-
-    window.addEventListener('resize', function () {
-      resize();
-      createParticles();
-      createStreams();
-    });
+    resize();
+    window.addEventListener('resize', resize);
 
     document.addEventListener('mousemove', function (e) {
-      mouse.x = e.clientX;
-      mouse.y = e.clientY;
+      var rect = container.getBoundingClientRect();
+      target.x = (e.clientX - rect.left) / rect.width;
+      target.y = 1.0 - (e.clientY - rect.top) / rect.height;
+      activeTarget = 1;
     });
 
     document.addEventListener('mouseleave', function () {
-      mouse.x = -9999;
-      mouse.y = -9999;
+      activeTarget = 0;
     });
 
-    init();
+    var raf;
+    function tick(t) {
+      raf = requestAnimationFrame(tick);
+      var s = 0.05;
+      mouse.x += (target.x - mouse.x) * s;
+      mouse.y += (target.y - mouse.y) * s;
+      active += (activeTarget - active) * s;
+
+      gl.uniform1f(uTime, t * 0.001);
+      gl.uniform3f(uRes, canvas.width, canvas.height, canvas.width / canvas.height);
+      gl.uniform2f(uMouse, mouse.x, mouse.y);
+      gl.uniform1f(uMouseActive, active);
+      gl.drawArrays(gl.TRIANGLES, 0, 3);
+    }
+
+    raf = requestAnimationFrame(tick);
   })();
   </script>
 </body>
