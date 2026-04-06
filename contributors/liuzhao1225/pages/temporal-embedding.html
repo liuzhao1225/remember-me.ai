@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Temporal Embedding：为 Transformer 引入时间认知的实验构想</title>
+  <meta name="description" content="面向大模型时间认知能力的 Temporal Embedding 研究设想。">
+  <style>
+    :root {
+      --bg: #f4efe6;
+      --paper: rgba(255, 250, 242, 0.78);
+      --paper-strong: rgba(255, 248, 237, 0.92);
+      --ink: #1d1a17;
+      --ink-soft: #5d554d;
+      --line: rgba(29, 26, 23, 0.12);
+      --accent: #8c3d20;
+      --accent-deep: #542615;
+      --accent-soft: #e7c7b7;
+      --teal: #215e63;
+      --shadow: 0 24px 60px rgba(55, 36, 18, 0.12);
+      --radius: 24px;
+      --max: 1180px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(140, 61, 32, 0.16), transparent 28%),
+        radial-gradient(circle at top right, rgba(33, 94, 99, 0.13), transparent 24%),
+        linear-gradient(180deg, #efe5d7 0%, #f7f2ea 38%, #f2ece1 100%);
+      font-family: "Avenir Next", "PingFang SC", "Hiragino Sans GB", "Noto Sans SC", sans-serif;
+      line-height: 1.7;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .frame {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .frame::before,
+    .frame::after {
+      content: "";
+      position: fixed;
+      inset: auto;
+      width: 34rem;
+      height: 34rem;
+      border-radius: 50%;
+      filter: blur(80px);
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.32;
+    }
+
+    .frame::before {
+      top: -10rem;
+      left: -10rem;
+      background: rgba(140, 61, 32, 0.18);
+    }
+
+    .frame::after {
+      right: -12rem;
+      bottom: 10rem;
+      background: rgba(33, 94, 99, 0.15);
+    }
+
+    .wrap {
+      position: relative;
+      z-index: 1;
+      width: min(var(--max), calc(100% - 32px));
+      margin: 0 auto;
+    }
+
+    .topbar {
+      padding: 24px 0 0;
+    }
+
+    .crumbs {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(255, 250, 242, 0.56);
+      backdrop-filter: blur(14px);
+      color: var(--ink-soft);
+      font-size: 14px;
+    }
+
+    .crumbs strong {
+      color: var(--ink);
+      font-weight: 600;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.25fr) minmax(320px, 0.75fr);
+      gap: 28px;
+      padding: 24px 0 36px;
+      align-items: stretch;
+    }
+
+    .hero-panel,
+    .hero-side,
+    .section,
+    .card,
+    .timeline-item,
+    .metric,
+    .footer-box {
+      background: var(--paper);
+      backdrop-filter: blur(18px);
+      border: 1px solid rgba(255, 255, 255, 0.45);
+      box-shadow: var(--shadow);
+    }
+
+    .hero-panel {
+      border-radius: 32px;
+      padding: 34px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-panel::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(125deg, rgba(140, 61, 32, 0.08), transparent 35%),
+        linear-gradient(305deg, rgba(33, 94, 99, 0.08), transparent 42%);
+      pointer-events: none;
+    }
+
+    .eyebrow {
+      display: inline-block;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(140, 61, 32, 0.1);
+      color: var(--accent-deep);
+      font-size: 13px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 18px;
+    }
+
+    h1 {
+      margin: 0;
+      font-family: "Iowan Old Style", "Palatino Linotype", "Songti SC", serif;
+      font-size: clamp(40px, 6vw, 72px);
+      line-height: 0.98;
+      letter-spacing: -0.03em;
+    }
+
+    .hero-subtitle {
+      margin: 18px 0 0;
+      max-width: 44rem;
+      font-size: clamp(18px, 2vw, 22px);
+      color: var(--ink-soft);
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 28px;
+    }
+
+    .button,
+    .button-ghost {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 13px 18px;
+      border-radius: 999px;
+      font-size: 15px;
+      transition: transform 0.22s ease, box-shadow 0.22s ease, background 0.22s ease;
+    }
+
+    .button {
+      background: linear-gradient(135deg, var(--accent), var(--accent-deep));
+      color: #fff7f0;
+      box-shadow: 0 18px 34px rgba(84, 38, 21, 0.22);
+    }
+
+    .button-ghost {
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.44);
+      color: var(--ink);
+    }
+
+    .button:hover,
+    .button-ghost:hover {
+      transform: translateY(-1px);
+    }
+
+    .hero-side {
+      border-radius: 28px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      background: var(--paper-strong);
+    }
+
+    .hero-side h2,
+    .section h2 {
+      margin: 0;
+      font-family: "Iowan Old Style", "Palatino Linotype", "Songti SC", serif;
+      font-size: 28px;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+    }
+
+    .hero-side p,
+    .section p,
+    .card p,
+    .timeline-item p,
+    .footer-box p {
+      color: var(--ink-soft);
+      margin: 0;
+    }
+
+    .mini-list {
+      margin: 18px 0 0;
+      padding: 0;
+      list-style: none;
+      display: grid;
+      gap: 12px;
+    }
+
+    .mini-list li {
+      padding: 14px 16px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.45);
+      border: 1px solid rgba(29, 26, 23, 0.08);
+    }
+
+    .mini-list strong {
+      display: block;
+      font-size: 15px;
+      margin-bottom: 2px;
+    }
+
+    .main {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 290px;
+      gap: 26px;
+      padding-bottom: 56px;
+    }
+
+    .content {
+      display: grid;
+      gap: 24px;
+    }
+
+    .section {
+      border-radius: var(--radius);
+      padding: 28px;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    .section-index {
+      color: var(--accent);
+      font-size: 14px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .lead {
+      font-size: 18px;
+      color: var(--ink);
+      margin-bottom: 18px;
+    }
+
+    .grid-2,
+    .grid-3 {
+      display: grid;
+      gap: 16px;
+    }
+
+    .grid-2 {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .grid-3 {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .card,
+    .metric {
+      border-radius: 22px;
+      padding: 20px;
+    }
+
+    .card h3,
+    .timeline-item h3 {
+      margin: 0 0 8px;
+      font-size: 18px;
+      line-height: 1.25;
+    }
+
+    .metric-value {
+      font-family: "Iowan Old Style", "Palatino Linotype", "Songti SC", serif;
+      font-size: 36px;
+      line-height: 1;
+      margin-bottom: 10px;
+      color: var(--accent-deep);
+    }
+
+    .bullet-list {
+      list-style: none;
+      padding: 0;
+      margin: 16px 0 0;
+      display: grid;
+      gap: 12px;
+    }
+
+    .bullet-list li {
+      position: relative;
+      padding-left: 18px;
+      color: var(--ink-soft);
+    }
+
+    .bullet-list li::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 11px;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+    }
+
+    .timeline {
+      display: grid;
+      gap: 14px;
+      margin-top: 16px;
+    }
+
+    .timeline-item {
+      border-radius: 20px;
+      padding: 18px 20px;
+      position: relative;
+    }
+
+    .timeline-item::before {
+      content: attr(data-step);
+      position: absolute;
+      right: 18px;
+      top: 16px;
+      font-size: 12px;
+      color: rgba(29, 26, 23, 0.38);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .formula {
+      margin-top: 18px;
+      padding: 18px 20px;
+      border-radius: 22px;
+      background: linear-gradient(135deg, rgba(140, 61, 32, 0.1), rgba(33, 94, 99, 0.08));
+      border: 1px solid rgba(29, 26, 23, 0.08);
+      font-family: "SFMono-Regular", "Menlo", monospace;
+      font-size: 15px;
+      color: var(--accent-deep);
+      overflow-x: auto;
+    }
+
+    .quote {
+      margin-top: 20px;
+      padding: 20px 22px;
+      border-left: 4px solid var(--accent);
+      background: rgba(255, 255, 255, 0.46);
+      border-radius: 0 18px 18px 0;
+      font-size: 17px;
+      color: var(--ink);
+    }
+
+    .sidebar {
+      position: sticky;
+      top: 24px;
+      height: fit-content;
+      display: grid;
+      gap: 18px;
+    }
+
+    .toc,
+    .footer-box {
+      border-radius: 24px;
+      padding: 22px;
+    }
+
+    .toc h3,
+    .footer-box h3 {
+      margin: 0 0 14px;
+      font-size: 17px;
+    }
+
+    .toc ol {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      gap: 10px;
+      counter-reset: toc;
+    }
+
+    .toc li {
+      counter-increment: toc;
+    }
+
+    .toc a {
+      display: grid;
+      grid-template-columns: 26px 1fr;
+      gap: 10px;
+      align-items: start;
+      color: var(--ink-soft);
+      font-size: 14px;
+    }
+
+    .toc a::before {
+      content: "0" counter(toc);
+      color: var(--accent);
+      font-size: 12px;
+      letter-spacing: 0.1em;
+      padding-top: 2px;
+    }
+
+    .footer-box {
+      background: linear-gradient(180deg, rgba(255, 248, 237, 0.92), rgba(244, 239, 230, 0.88));
+    }
+
+    .footer-box .button,
+    .footer-box .button-ghost {
+      width: 100%;
+      justify-content: center;
+      margin-top: 12px;
+    }
+
+    .site-footer {
+      padding: 0 0 40px;
+      color: rgba(29, 26, 23, 0.58);
+      font-size: 13px;
+    }
+
+    @media (max-width: 980px) {
+      .hero,
+      .main,
+      .grid-2,
+      .grid-3 {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        position: static;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .wrap {
+        width: min(var(--max), calc(100% - 18px));
+      }
+
+      .hero-panel,
+      .hero-side,
+      .section,
+      .toc,
+      .footer-box {
+        padding: 22px;
+      }
+
+      .hero-actions {
+        flex-direction: column;
+      }
+
+      .button,
+      .button-ghost {
+        width: 100%;
+        justify-content: center;
+      }
+
+      .section-header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="frame">
+    <div class="wrap topbar">
+      <div class="crumbs">
+        <a href="/remember-me.ai/">remember-me.ai</a>
+        <span>/</span>
+        <a href="/remember-me.ai/contributors/liuzhao1225/">liuzhao1225</a>
+        <span>/</span>
+        <strong>Temporal Embedding</strong>
+      </div>
+    </div>
+
+    <header class="wrap hero">
+      <section class="hero-panel">
+        <span class="eyebrow">Research Concept Note</span>
+        <h1>Temporal<br>Embedding</h1>
+        <p class="hero-subtitle">
+          为 Transformer 引入时间认知的实验构想。核心目标不是先做一个工业系统，而是回答一个更基础的问题：
+          时间能否像位置一样，进入模型底层表示，成为大模型理解动态世界的结构性信号。
+        </p>
+        <div class="hero-actions">
+          <a class="button" href="#background">为什么会想到它</a>
+          <a class="button-ghost" href="#pretrain">如何做预训练与微调</a>
+        </div>
+      </section>
+
+      <aside class="hero-side">
+        <div>
+          <h2>一句话概括</h2>
+          <p>
+            Positional Encoding 解决的是“这个 token 在前还是在后”，Temporal Embedding 要解决的是“这段内容发生在什么时候，它与当前世界相距多远”。
+          </p>
+        </div>
+        <ul class="mini-list">
+          <li>
+            <strong>主问题</strong>
+            absolute time embedding 本身会怎样改变 Transformer 的表示与泛化能力。
+          </li>
+          <li>
+            <strong>辅助变量</strong>
+            local context 作为第二阶段对照，观察本地语境是否带来额外收益。
+          </li>
+          <li>
+            <strong>汇报定位</strong>
+            更偏研究设想与方向判断，不展开工程落地细节。
+          </li>
+        </ul>
+      </aside>
+    </header>
+
+    <main class="wrap main">
+      <div class="content">
+        <section class="section" id="background">
+          <div class="section-header">
+            <h2>为什么会想到 Temporal Embedding</h2>
+            <div class="section-index">01 / Background</div>
+          </div>
+          <p class="lead">
+            现有 Transformer 对“位置”敏感，但对“时间”并不原生敏感。它知道句子内部的先后顺序，却不天然知道一条内容发生在去年、今天还是几小时之后。
+          </p>
+          <div class="grid-3">
+            <article class="metric">
+              <div class="metric-value">位置</div>
+              <p>Positional Encoding 解决序列顺序问题，让模型知道 token 的相对前后。</p>
+            </article>
+            <article class="metric">
+              <div class="metric-value">时间</div>
+              <p>现实任务中的“最新”“今天”“下周”“昨晚”都依赖明确时间锚点。</p>
+            </article>
+            <article class="metric">
+              <div class="metric-value">缺口</div>
+              <p>模型当前更多是文本匹配日期，而不是结构化建模时间。</p>
+            </article>
+          </div>
+          <ul class="bullet-list">
+            <li>新闻、搜索、金融、客服、多轮对话、知识更新，本质上都带有强时间属性。</li>
+            <li>同一句文本在不同时间点可能含义不同，时间不是附属 metadata，而是语义变量。</li>
+            <li>如果时间只存在于 prompt 文本里，模型仍主要是在“猜”；如果时间以 embedding 形式进入表示层，才有机会成为底层结构信号。</li>
+          </ul>
+          <div class="quote">
+            因此自然会出现一个研究问题：既然 Transformer 已经通过位置编码解决了“序列坐标”，是否也可以通过一种系统机制，把“现实时间坐标”写进模型内部？
+          </div>
+        </section>
+
+        <section class="section" id="definition">
+          <div class="section-header">
+            <h2>Temporal Embedding 是什么</h2>
+            <div class="section-index">02 / Concept</div>
+          </div>
+          <p class="lead">
+            Temporal Embedding 是一种将绝对时间信息编码为连续向量，并注入 Transformer 表示层的机制。它让模型在处理文本时，不只看内容和位置，也同时看“这段内容发生在什么时间”。
+          </p>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Absolute Temporal Embedding (ATE)</h3>
+              <p>
+                ATE 是主时间轴。它提供统一的绝对时间锚点，例如 UTC 时间戳、日期、时段以及周期分量。它回答的是：
+                内容发生在什么时候、谁更早谁更晚、与当前时间相距多远。
+              </p>
+            </article>
+            <article class="card">
+              <h3>Locale Context Embedding (LCE)</h3>
+              <p>
+                LCE 是本地语境层。它补充时区、地区、本地时间、工作日与节假日、昼夜阶段等上下文，
+                回答的是：同一个绝对时间点，对某个用户意味着清晨、午间还是深夜。
+              </p>
+            </article>
+          </div>
+          <div class="formula">
+            token representation = token embedding + positional embedding + absolute temporal embedding (+ optional locale context embedding)
+          </div>
+          <ul class="bullet-list">
+            <li>ATE 是研究主问题，应常驻输入，不做 input-dependent gate。</li>
+            <li>LCE 更适合作为辅助变量，可在第二阶段做 no-gate 与 gate 对比。</li>
+            <li>这不是替代 Positional Encoding，而是在 token 和 position 之外，补上第三类基础坐标：time。</li>
+          </ul>
+        </section>
+
+        <section class="section" id="logic">
+          <div class="section-header">
+            <h2>它与 Position Encoding 的关系</h2>
+            <div class="section-index">03 / Framing</div>
+          </div>
+          <div class="timeline">
+            <article class="timeline-item" data-step="same family">
+              <h3>相同点：都在补模型缺失的坐标系</h3>
+              <p>位置编码给模型一个序列坐标系；时间嵌入给模型一个现实时间坐标系。</p>
+            </article>
+            <article class="timeline-item" data-step="different target">
+              <h3>不同点：位置回答“在文本里哪儿”，时间回答“在世界里何时”</h3>
+              <p>前者描述 token 顺序，后者描述内容发生时间、时间间隔和时效性。</p>
+            </article>
+            <article class="timeline-item" data-step="research value">
+              <h3>研究价值：从静态文本建模，走向带时间轴的世界建模</h3>
+              <p>如果这个假设成立，时间将不只是注释信息，而会成为模型组织知识与注意力的底层变量。</p>
+            </article>
+          </div>
+        </section>
+
+        <section class="section" id="hypothesis">
+          <div class="section-header">
+            <h2>实验构思的核心假设</h2>
+            <div class="section-index">04 / Hypothesis</div>
+          </div>
+          <div class="grid-3">
+            <article class="card">
+              <h3>假设一</h3>
+              <p>把绝对时间作为结构化信号注入 Transformer，会改变模型的表示空间组织方式。</p>
+            </article>
+            <article class="card">
+              <h3>假设二</h3>
+              <p>这种变化会提升模型对动态知识、时序关系和时间条件任务的处理能力。</p>
+            </article>
+            <article class="card">
+              <h3>假设三</h3>
+              <p>本地语境可能进一步增强效果，但不是第一阶段必须解决的问题。</p>
+            </article>
+          </div>
+          <ul class="bullet-list">
+            <li>第一阶段要验证的是“时间本身进入模型有没有价值”，而不是先做完整系统。</li>
+            <li>absolute time 常驻输入可以让因果更清楚，避免把“时间有效”与“门控机制有效”混在一起。</li>
+            <li>无 gate 不等于无约束。ATE 仍应有固定投影、归一化和受控幅度，防止信号过强污染实验。</li>
+          </ul>
+        </section>
+
+        <section class="section" id="pretrain">
+          <div class="section-header">
+            <h2>如何进行 Pretrain</h2>
+            <div class="section-index">05 / Pretrain</div>
+          </div>
+          <p class="lead">
+            预训练阶段的目标，不是换掉语言模型任务，而是在原有语言建模过程中，让模型同时学习“文本内容”和“时间坐标”的联合分布。
+          </p>
+          <div class="timeline">
+            <article class="timeline-item" data-step="data">
+              <h3>1. 数据准备</h3>
+              <p>预训练语料除了文本本身，还尽量带有时间标签。新闻、论坛、博客、论文、知识库、日志、对话记录，都可以作为天然时间语料来源。</p>
+            </article>
+            <article class="timeline-item" data-step="encoding">
+              <h3>2. 时间表示构造</h3>
+              <p>为每条样本抽取时间锚点，编码为 ATE。编码内容可以包括连续时间戳、年月日时、周期分量，以及需要时的相对时间特征。</p>
+            </article>
+            <article class="timeline-item" data-step="injection">
+              <h3>3. 进入表示层</h3>
+              <p>在输入端将 temporal embedding 与 token embedding、position embedding 联合输入，使模型从一开始就在“文本 + 位置 + 时间”的坐标系中学习。</p>
+            </article>
+            <article class="timeline-item" data-step="objective">
+              <h3>4. 训练目标保持稳定</h3>
+              <p>总体仍然沿用语言模型目标，不急于重新设计大而全的新目标函数。重点是观察时间信号进入模型后，表示学习与泛化能力是否发生变化。</p>
+            </article>
+          </div>
+          <div class="quote">
+            Pretrain 阶段真正想回答的是：时间坐标是否值得成为 Transformer 的底层输入变量，而不是只做 prompt 里的附加文本。
+          </div>
+        </section>
+
+        <section class="section" id="finetune">
+          <div class="section-header">
+            <h2>如何进行 Finetune</h2>
+            <div class="section-index">06 / Finetune</div>
+          </div>
+          <p class="lead">
+            微调阶段的目标，是把预训练中获得的基础时间表征迁移到具体任务中，验证它是否真正可用。
+          </p>
+          <div class="grid-2">
+            <article class="card">
+              <h3>适合验证的任务</h3>
+              <ul class="bullet-list">
+                <li>时间排序与时序推理</li>
+                <li>新闻和事件的新旧判断</li>
+                <li>时间条件问答</li>
+                <li>带时间上下文的多轮对话</li>
+                <li>具有时效性的检索与生成</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>微调阶段的关注点</h3>
+              <ul class="bullet-list">
+                <li>时间信号是否能稳定迁移到下游任务</li>
+                <li>ATE 与 LCE 各自贡献什么</li>
+                <li>是否值得继续走向工业系统级优化</li>
+                <li>时间输入应长期保留，而不是在下游阶段被拿掉</li>
+              </ul>
+            </article>
+          </div>
+          <div class="formula">
+            recommended ablation:
+            token + pos
+            token + pos + abs_time
+            token + pos + abs_time + local_context
+            token + pos + abs_time + gated_local_context
+          </div>
+        </section>
+
+        <section class="section" id="roadmap">
+          <div class="section-header">
+            <h2>建议的研究路径</h2>
+            <div class="section-index">07 / Roadmap</div>
+          </div>
+          <div class="timeline">
+            <article class="timeline-item" data-step="phase 1">
+              <h3>第一阶段：验证主命题</h3>
+              <p>先回答 ATE 是否值得进入 Transformer 底层。这个阶段追求因果清晰，而不是系统完整。</p>
+            </article>
+            <article class="timeline-item" data-step="phase 2">
+              <h3>第二阶段：验证条件增强</h3>
+              <p>在 ATE 基础上引入 LCE，对比 no-gate 与 gate，观察本地化时间语境是否带来稳定收益。</p>
+            </article>
+            <article class="timeline-item" data-step="phase 3">
+              <h3>第三阶段：再谈工程化</h3>
+              <p>更复杂的联合优化、记忆系统、检索增强、时间约束推理，都可以留到后续工业实现，而不应抢走第一篇研究的主线。</p>
+            </article>
+          </div>
+        </section>
+
+        <section class="section" id="value">
+          <div class="section-header">
+            <h2>这个实验构思的价值</h2>
+            <div class="section-index">08 / Value</div>
+          </div>
+          <div class="grid-3">
+            <article class="card">
+              <h3>理论价值</h3>
+              <p>在 token 与 position 之外，探索 time 是否可以成为第三类基础坐标。</p>
+            </article>
+            <article class="card">
+              <h3>应用价值</h3>
+              <p>对新闻、搜索、对话、知识更新、长记忆 agent 等场景都具有潜在意义。</p>
+            </article>
+            <article class="card">
+              <h3>战略价值</h3>
+              <p>它帮助回答一个更大的问题：大模型是否需要从静态语料建模走向动态世界建模。</p>
+            </article>
+          </div>
+          <div class="quote">
+            Temporal Embedding 的意义，不在于给文本多加一个日期字段，而在于测试一件更底层的事：时间能否像位置一样，成为模型组织知识、理解世界、处理变化的结构性信号。
+          </div>
+        </section>
+      </div>
+
+      <aside class="sidebar">
+        <nav class="toc">
+          <h3>目录</h3>
+          <ol>
+            <li><a href="#background">为什么会想到它</a></li>
+            <li><a href="#definition">Temporal Embedding 是什么</a></li>
+            <li><a href="#logic">与 Position Encoding 的关系</a></li>
+            <li><a href="#hypothesis">核心假设</a></li>
+            <li><a href="#pretrain">Pretrain 思路</a></li>
+            <li><a href="#finetune">Finetune 思路</a></li>
+            <li><a href="#roadmap">研究路径</a></li>
+            <li><a href="#value">项目价值</a></li>
+          </ol>
+        </nav>
+
+        <section class="footer-box">
+          <h3>适合汇报的收口</h3>
+          <p>
+            我们并不是先做一个完整工业系统，而是先验证一个基础命题：
+            绝对时间进入模型之后，是否会改变 Transformer 的表示方式，并为后续时间感知模型打下基础。
+          </p>
+          <a class="button" href="/remember-me.ai/contributors/liuzhao1225/">返回个人主页</a>
+          <a class="button-ghost" href="/remember-me.ai/contributors/liuzhao1225/2026-04-06-没有轮回-就没有时间/">查看相关文章</a>
+        </section>
+      </aside>
+    </main>
+
+    <div class="wrap site-footer">
+      Temporal Embedding concept page for remember-me.ai / liuzhao1225
+    </div>
+  </div>
+</body>
+</html>

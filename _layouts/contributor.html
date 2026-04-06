@@ -24,3 +24,15 @@ layout: default
   {% endfor %}
 </ul>
 {% endif %}
+
+{% if page.pages.size > 0 %}
+<hr style="margin: 2rem 0; border: none; border-top: 1px solid rgba(100, 180, 255, 0.1);">
+<h2>页面</h2>
+<ul class="post-list">
+  {% for item in page.pages %}
+  <li>
+    <a href="{{ site.baseurl }}/contributors/{{ page.username }}/{{ item.path }}">{{ item.title }}</a>
+  </li>
+  {% endfor %}
+</ul>
+{% endif %}

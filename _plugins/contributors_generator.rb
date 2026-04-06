@@ -36,6 +36,7 @@ module RememberMe
         quote = readme[/^>\s*(.+)/, 1]&.strip || ""
 
         posts = collect_posts(user_dir)
+        pages = collect_pages(user_dir)
         last_updated = posts.map { |p| p["date"] }.reject(&:empty?).max || ""
 
         site.data["contributors"] << {
@@ -43,6 +44,7 @@ module RememberMe
           "title" => title,
           "quote" => quote,
           "posts" => posts,
+          "pages" => pages,
           "last_updated" => last_updated,
         }
 
@@ -54,7 +56,7 @@ module RememberMe
           "contributors/#{username}",
           "index.md",
           rendered_readme,
-          { "layout" => "contributor", "title" => title, "username" => username, "posts" => posts }
+          { "layout" => "contributor", "title" => title, "username" => username, "posts" => posts, "pages" => pages }
         )
 
         posts.each do |post|
@@ -64,6 +66,16 @@ module RememberMe
             "index.md",
             post["content"],
             { "layout" => "post", "title" => post["title"], "username" => username }
+          )
+        end
+
+        pages.select { |page| page["content"] }.each do |page|
+          site.pages << GeneratedPage.new(
+            site,
+            "contributors/#{username}/pages/#{page['slug']}",
+            "index.md",
+            page["content"],
+            { "layout" => page["layout"], "title" => page["title"], "username" => username }
           )
         end
       end
@@ -93,6 +105,34 @@ module RememberMe
           slug = file.sub(/\.md$/, "")
           date = slug[/^(\d{4}-\d{2}-\d{2})/, 1] || ""
           { "title" => title, "slug" => slug, "date" => date, "content" => content }
+        end
+    end
+
+    def collect_pages(user_dir)
+      pages_dir = File.join(user_dir, "pages")
+      return [] unless File.directory?(pages_dir)
+
+      Dir.children(pages_dir)
+        .select { |f| f.end_with?(".html") || f.end_with?(".md") }
+        .sort
+        .map do |file|
+          path = File.join(pages_dir, file)
+          content = File.read(path, encoding: "utf-8")
+          slug = file.sub(/\.(html|md)$/, "")
+
+          if file.end_with?(".html")
+            title = content[/<title>(.+?)<\/title>/im, 1]&.strip || slug
+            { "title" => title, "slug" => slug, "path" => "pages/#{file}" }
+          else
+            title = content[/^#\s+(.+)/, 1]&.strip || slug
+            {
+              "title" => title,
+              "slug" => slug,
+              "path" => "pages/#{slug}/",
+              "content" => content,
+              "layout" => "post",
+            }
+          end
         end
     end
   end
