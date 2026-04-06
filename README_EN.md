@@ -67,6 +67,8 @@ contributors/<your-username>/
 ├── about.md       # A more detailed self-introduction
 ├── posts/         # Articles, thoughts, journals — any writing you want to leave behind
 │   └── 2025-02-24-my-first-post.md
+├── pages/         # Landing pages, showcases, or standalone HTML pages
+│   └── my-project.html
 └── assets/        # Avatar, photos, and other image files
     └── avatar.jpg
 ```
@@ -80,7 +82,12 @@ Open `README.md` and fill it in using the template. There's no rigid format, but
 - **Your work**: Articles, projects, videos, music — anything you've created
 - **Your story**: Experiences, turning points, the moments that shaped you
 
-Use the `posts/` directory for longer writing. We recommend naming files as `date-title.md`, e.g., `2025-02-24-why-i-believe-in-ai.md`.
+Use `README.md` only for your homepage content. You do not need to manually maintain lists of articles or pages. The site will automatically read:
+
+- `posts/`: shown under "Articles"; we recommend names like `date-title.md`, e.g. `2025-02-24-why-i-believe-in-ai.md`
+- `pages/`: shown under "Pages"; useful for landing pages, showcases, and standalone HTML pages
+
+This keeps your homepage clean while letting the site automatically surface your longer writing and custom pages.
 
 ### Step 4: Handle Media Files
 
@@ -97,6 +104,8 @@ Use the `posts/` directory for longer writing. We recommend naming files as `dat
 ```
 
 **Audio**: Same as video — upload to SoundCloud, Spotify, etc., and paste the link.
+
+**Standalone pages**: If you want a custom project page, showcase, or standalone HTML page, place it in the `pages/` directory. It will automatically appear in the "Pages" section on your contributor homepage.
 
 ### Step 5: Submit a Pull Request
 
