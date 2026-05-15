@@ -1,0 +1,305 @@
+flowchart TD
+  %% 未来工作：从 Vibe Coding 到 Vibe Management
+  %% 目的：把文章核心推演、外部 evidence、反方风险和可修改方向放进一张可渲染的 Mermaid 图。
+  %% 维护建议：新增证据时优先加到 Evidence Hub，再接入对应推演节点；不要把 URL 塞进长标签，使用 click 指令。
+
+  classDef thesis fill:#f8fafc,stroke:#111827,stroke-width:2px,color:#111827
+  classDef premise fill:#eef6ff,stroke:#2563eb,color:#0f172a
+  classDef evidence fill:#ecfdf5,stroke:#059669,color:#064e3b
+  classDef reasoning fill:#fff7ed,stroke:#ea580c,color:#7c2d12
+  classDef future fill:#f5f3ff,stroke:#7c3aed,color:#3b0764
+  classDef risk fill:#fef2f2,stroke:#dc2626,color:#7f1d1d
+  classDef guardrail fill:#f0f9ff,stroke:#0284c7,color:#0c4a6e
+  classDef edit fill:#fefce8,stroke:#ca8a04,color:#713f12
+  classDef immortal fill:#fdf2f8,stroke:#db2777,color:#831843
+
+  ROOT["核心命题<br/>未来工作从 Vibe Coding 走向 Vibe Work<br/>再走向 Vibe Management"]:::thesis
+
+  subgraph P["一、底层前提"]
+    P1["P1 工作本质是信息流<br/>读取状态 -> 判断流向 -> 生成行动"]:::premise
+    P2["P2 Agent 正在获得工具使用能力<br/>代码、浏览器、CLI、API、MCP、文档、消息"]:::premise
+    P3["P3 主机和屏幕开始分离<br/>执行环境远端化，控制端随身化"]:::premise
+    P4["P4 代码最先被击穿<br/>因为代码有测试、日志、版本、回滚"]:::premise
+    P5["P5 人的输入方式降级为意图表达<br/>自然语言、语音、审批、例外处理"]:::premise
+    P6["P6 App 从人类 UI 变成 Agent 接口<br/>状态机、动作接口、事件流、权限审计"]:::premise
+  end
+
+  ROOT --> P1
+  ROOT --> P2
+  ROOT --> P3
+  ROOT --> P4
+  ROOT --> P5
+  ROOT --> P6
+
+  subgraph E["二、Evidence Hub：外部证据地图"]
+    E1["E1 OpenAI Codex mobile<br/>手机连接 laptop、devbox、remote env<br/>看 diff、测试、截图、批准命令"]:::evidence
+    E2["E2 Microsoft 正式提出 Vibe Working<br/>Office Agent / Agent Mode<br/>自然语言驱动文档、表格、PPT"]:::evidence
+    E3["E3 Microsoft WorkLab 四阶段<br/>Author -> Editor -> Director -> Orchestrator<br/>人从写作转向系统设计和介入判断"]:::evidence
+    E4["E4 Microsoft 2026 WTI<br/>Frontier Professionals 占 AI 用户 16%<br/>关键能力是质量控制和批判思考"]:::evidence
+    E5["E5 Microsoft Agent 365<br/>把 agent 当成可管理实体<br/>registry、access control、telemetry、audit"]:::evidence
+    E6["E6 Axios：软件需要为 agents 演化<br/>竞争从 UI 转向 API、数据、权限"]:::evidence
+    E7["E7 MCP 标准化外部连接<br/>AI 应用连接 files、DB、tools、workflows"]:::evidence
+    E8["E8 Karpathy：2025-12 后基本不手敲代码<br/>从 80% 自写转为 80% 交给 agent"]:::evidence
+    E9["E9 Anthropic / OpenAI 工程师案例<br/>部分顶尖工程师称代码 100% 由 AI 生成<br/>公司层面仍是 70%-90% 等区间"]:::evidence
+    E10["E10 Spotify 案例<br/>高级工程师不写代码而监控生成<br/>手机/Slack 触发 agent 做 app 变更"]:::evidence
+    E11["E11 METR Time Horizon<br/>前沿 agent 已进入多小时到十小时级任务<br/>但 16h+ 测量不可靠"]:::evidence
+    E12["E12 METR 生产力研究<br/>2025 早期 AI 让熟悉代码库的专家慢 19%<br/>2026 又认为测量受到选择效应影响"]:::evidence
+    E13["E13 HBR / Stanford / BetterUp Workslop<br/>AI 低质量产出把验证和返工成本转嫁给别人"]:::evidence
+    E14["E14 AR / AI 眼镜证据<br/>Meta Ray-Ban Display、Google/Warby 2026<br/>VisionClaw 验证眼镜上 agent 执行任务"]:::evidence
+    E15["E15 McKinsey Agentic Ops<br/>routine infra work 可自动化 60%-80%<br/>低风险自动执行，高风险人工批准"]:::evidence
+  end
+
+  E1 --> P3
+  E1 --> P5
+  E2 --> P1
+  E2 --> P2
+  E3 --> P5
+  E3 --> VM0
+  E4 --> P5
+  E4 --> G5
+  E5 --> P6
+  E5 --> G2
+  E6 --> P6
+  E7 --> P2
+  E7 --> P6
+  E8 --> P4
+  E9 --> P4
+  E10 --> P3
+  E10 --> P4
+  E11 --> R6
+  E12 --> K2
+  E13 --> K1
+  E14 --> D4
+  E15 --> VM2
+
+  subgraph R["三、逻辑推演链"]
+    R1["R1 代码领域先发生<br/>代码天然拥有 agent 需要的反馈回路"]:::reasoning
+    R2["R2 其他知识工作会补齐同类基础设施<br/>结构化输入、可执行动作、可验证结果"]:::reasoning
+    R3["R3 Vibe Coding 变成 Vibe Work<br/>人说目标，agent 调工具完成跨系统任务"]:::reasoning
+    R4["R4 Vibe Work 继续变成 Vibe Management<br/>人不只指挥一个任务，而是编排多个 agent"]:::reasoning
+    R5["R5 人类角色变化<br/>从执行者、审核者<br/>变成目标函数、约束条件、责任节点"]:::reasoning
+    R6["R6 人工参与点坍缩<br/>连续参与 -> 关键节点参与<br/>目标、权限、异常、验收、责任"]:::reasoning
+    R7["R7 界面变化<br/>人类 UI 退居后台<br/>agent control plane 上升"]:::reasoning
+    R8["R8 组织变化<br/>管理对象从人和任务<br/>扩展到 agent、权限、信息流、验证系统"]:::reasoning
+  end
+
+  P4 --> R1
+  R1 --> R2
+  P1 --> R2
+  P2 --> R3
+  P6 --> R3
+  R3 --> R4
+  R4 --> R5
+  P5 --> R5
+  R5 --> R6
+  P3 --> R7
+  P6 --> R7
+  R4 --> R8
+  R6 --> R8
+
+  subgraph VM["四、Vibe Management 的定义"]
+    VM0["VM0 定义<br/>不是用 AI 偷懒<br/>而是把工作组织成可编排的信息系统"]:::future
+    VM1["VM1 新工作单元<br/>一句目标 + 一组 Agent + 一组权限 + 一个可验证结果"]:::future
+    VM2["VM2 管理对象变化<br/>人、任务、流程 -> agent、工具、上下文、权限、反馈回路"]:::future
+    VM3["VM3 人的新稀缺性<br/>判断、品味、价值排序、边界设定、责任承担"]:::future
+    VM4["VM4 组织新资产<br/>Owned Intelligence<br/>可复用的标准、检查、agent workflow、知识库"]:::future
+  end
+
+  R4 --> VM0
+  VM0 --> VM1
+  VM1 --> VM2
+  VM2 --> VM3
+  VM2 --> VM4
+
+  subgraph A["五、Agent-native App 架构"]
+    A1["A1 API 层<br/>稳定读写数据"]:::future
+    A2["A2 CLI 层<br/>可脚本化执行常见操作"]:::future
+    A3["A3 MCP / Tool 层<br/>统一暴露工具、资源、提示、工作流"]:::future
+    A4["A4 Event Stream 层<br/>订阅客户回复、CI 失败、审批通过、合同到期"]:::future
+    A5["A5 Semantic Action 层<br/>推进商机、归档会议、更新项目状态、发起审批"]:::future
+    A6["A6 Governance 层<br/>身份、权限、日志、审计、回滚"]:::guardrail
+  end
+
+  P6 --> A1
+  A1 --> A2
+  A2 --> A3
+  A3 --> A4
+  A4 --> A5
+  A5 --> A6
+  A6 --> VM2
+
+  subgraph D["六、设备重新分工"]
+    D1["D1 云端 / Devbox / Mac mini<br/>长任务、算力、上下文、文件、凭证"]:::future
+    D2["D2 手机<br/>随身审批器、低摩擦输入器、异常处理器"]:::future
+    D3["D3 平板<br/>临时工作台、短时深度介入、报告和任务树"]:::future
+    D4["D4 AR 眼镜<br/>环境化信息指挥舱<br/>摘要、提醒、批准、语音决策"]:::future
+    D5["D5 大屏<br/>高信息密度分析、复杂对照、少数深度审查"]:::future
+    D6["D6 键盘<br/>兜底精确输入，不再是默认入口"]:::future
+  end
+
+  P3 --> D1
+  D1 --> D2
+  D1 --> D3
+  D1 --> D4
+  D1 --> D5
+  D6 --> D5
+  D2 --> R6
+  D4 --> R7
+
+  subgraph K["七、反方观点和风险"]
+    K0["K0 过度表述风险<br/>不是所有工作都能立刻零人工"]:::risk
+    K1["K1 Workslop<br/>AI 产物看似完整但缺少实质<br/>把理解和返工转嫁给接收者"]:::risk
+    K2["K2 生产力错觉<br/>熟悉复杂代码库的专家可能被 AI 拖慢<br/>尤其在验证成本高时"]:::risk
+    K3["K3 权限和安全风险<br/>agent 误发资料、误部署、误删数据、越权访问"]:::risk
+    K4["K4 局部指标劫持<br/>agent 优化短期数字，破坏长期目标"]:::risk
+    K5["K5 责任真空<br/>agent 做了事，但没人能解释、追踪、承担"]:::risk
+    K6["K6 技能萎缩<br/>长期不手做导致人类判断力和基础能力下降"]:::risk
+    K7["K7 AR 信息密度限制<br/>眼镜不适合复杂代码、精细 UI、长 diff"]:::risk
+  end
+
+  R6 --> K0
+  R3 --> K1
+  R1 --> K2
+  A6 --> K3
+  VM2 --> K4
+  VM2 --> K5
+  R5 --> K6
+  D4 --> K7
+
+  subgraph G["八、对应防线：AgentOps / EvalOps / Human Agency"]
+    G1["G1 参与点坍缩，不是 0 参与<br/>人保留目标、风险、权限、验收、问责节点"]:::guardrail
+    G2["G2 AgentOps<br/>agent registry、identity、least privilege、lifecycle、kill switch"]:::guardrail
+    G3["G3 EvalOps<br/>自动测试、指标、抽样复核、对照组、回归检测"]:::guardrail
+    G4["G4 Audit Trail<br/>记录输入、工具调用、数据读写、决策理由、回滚路径"]:::guardrail
+    G5["G5 Human Agency<br/>质量控制、批判思考、判断是否该用 AI"]:::guardrail
+    G6["G6 Progressive Autonomy<br/>低风险自动执行，高风险请求批准"]:::guardrail
+    G7["G7 Skill Retention<br/>刻意保留部分手工训练和深度审查"]:::guardrail
+    G8["G8 AR 正确定位<br/>不是移动 IDE，而是随身指挥层"]:::guardrail
+  end
+
+  K0 --> G1
+  K1 --> G3
+  K2 --> G3
+  K3 --> G2
+  K3 --> G4
+  K4 --> G5
+  K5 --> G4
+  K6 --> G7
+  K7 --> G8
+  G1 --> VM1
+  G2 --> A6
+  G3 --> VM4
+  G4 --> VM4
+  G5 --> VM3
+  G6 --> R6
+  G8 --> D4
+
+  subgraph I["九、和 immortal.me / remember-me.ai 的连接"]
+    I1["I1 传统数字遗产<br/>保存一个人说过什么"]:::immortal
+    I2["I2 更深层数字永生<br/>保存一个人如何处理信息"]:::immortal
+    I3["I3 文章、观点、选择、表达<br/>构成个人信息路由方式"]:::immortal
+    I4["I4 Agent 时代的延续<br/>未来系统继续使用你的判断模式"]:::immortal
+    I5["I5 结论<br/>被记住是纪念<br/>被系统继续调用才接近数字永生"]:::immortal
+  end
+
+  P1 --> I2
+  I1 --> I2
+  I2 --> I3
+  I3 --> I4
+  I4 --> I5
+  I5 --> ROOT
+
+  subgraph W["十、文章可增强的写法"]
+    W1["W1 增加一句外部锚点<br/>Microsoft 已经把这个叫 Vibe Working"]:::edit
+    W2["W2 把人工零参与改得更精确<br/>人工参与点坍缩"]:::edit
+    W3["W3 加一节 AgentOps<br/>权限、审计、回滚、kill switch、least privilege"]:::edit
+    W4["W4 加入 Workslop 反方证据<br/>说明为什么验证系统比生成能力更重要"]:::edit
+    W5["W5 设备论再收窄<br/>AR 是 command layer，不是复杂审查屏幕"]:::edit
+    W6["W6 加入新范式公式<br/>目标 + agents + 权限 + 可验证结果"]:::edit
+    W7["W7 强化 immortal.me 落点<br/>数字永生是信息处理模式的延续"]:::edit
+  end
+
+  E2 --> W1
+  K0 --> W2
+  G2 --> W3
+  E13 --> W4
+  K7 --> W5
+  VM1 --> W6
+  I5 --> W7
+
+  subgraph S["十一、建议的文章骨架"]
+    S1["1 引子<br/>Codex mobile 表明主机和屏幕分离"]:::edit
+    S2["2 为什么从代码开始<br/>代码拥有反馈回路"]:::edit
+    S3["3 工作是信息流<br/>人当前是路由器和胶水组件"]:::edit
+    S4["4 App 的形态变化<br/>UI-first -> Agent-callable"]:::edit
+    S5["5 从 Vibe Coding 到 Vibe Working<br/>Microsoft evidence"]:::edit
+    S6["6 从 Vibe Working 到 Vibe Management<br/>Orchestrator / agent fleet"]:::edit
+    S7["7 设备重新分工<br/>云端执行、手机审批、AR 指挥"]:::edit
+    S8["8 风险和治理<br/>workslop、权限、安全、审计"]:::edit
+    S9["9 数字永生<br/>人作为信息处理模式被延续"]:::edit
+    S10["10 结论<br/>未来工作单元公式"]:::edit
+  end
+
+  W1 --> S5
+  W2 --> S6
+  W3 --> S8
+  W4 --> S8
+  W5 --> S7
+  W6 --> S10
+  W7 --> S9
+  S1 --> S2 --> S3 --> S4 --> S5 --> S6 --> S7 --> S8 --> S9 --> S10
+
+  subgraph C["十二、最终结论压缩"]
+    C1["如果工作是信息流"]:::thesis
+    C2["如果 agent 能读、写、判断、调用工具"]:::thesis
+    C3["如果 app 暴露 agent-native 接口"]:::thesis
+    C4["如果组织补上权限、审计、验证"]:::thesis
+    C5["那么人类工作的中心会从操作迁移到编排"]:::thesis
+    C6["Vibe Management = 目标设定 + agent 编排 + 风险治理 + 结果验收"]:::thesis
+  end
+
+  P1 --> C1
+  P2 --> C2
+  P6 --> C3
+  G2 --> C4
+  G3 --> C4
+  C1 --> C5
+  C2 --> C5
+  C3 --> C5
+  C4 --> C5
+  C5 --> C6
+  C6 --> ROOT
+
+  %% Evidence links
+  click E1 "https://openai.com/index/work-with-codex-from-anywhere/" "OpenAI: Work with Codex from anywhere"
+  click E2 "https://www.microsoft.com/en-us/microsoft-365/blog/2025/09/29/vibe-working-introducing-agent-mode-and-office-agent-in-microsoft-365-copilot/" "Microsoft 365: Vibe working"
+  click E3 "https://www.microsoft.com/en-us/worklab/ai-at-work-one-function-wrote-the-ai-playbook-the-rest-will-follow" "Microsoft WorkLab: Author, Editor, Director, Orchestrator"
+  click E4 "https://www.microsoft.com/en-us/worklab/work-trend-index/agents-human-agency-and-the-opportunity-for-every-organization" "Microsoft 2026 Work Trend Index"
+  click E5 "https://www.microsoft.com/en-us/microsoft-365/blog/2025/11/18/microsoft-agent-365-the-control-plane-for-ai-agents/" "Microsoft Agent 365"
+  click E6 "https://www.axios.com/2026/05/05/agents-ai-software-model-context-protocol" "Axios: Software needs to evolve for agents"
+  click E7 "https://modelcontextprotocol.io/docs/getting-started/intro" "MCP documentation"
+  click E8 "https://fortune.com/2026/03/21/andrej-karpathy-openai-cofounder-ai-agents-coding-state-of-psychosis-openclaw/" "Fortune: Karpathy no longer typing code"
+  click E9 "https://fortune.com/2026/01/29/100-percent-of-code-at-anthropic-and-openai-is-now-ai-written-boris-cherny-roon/" "Fortune: AI-written code at Anthropic/OpenAI"
+  click E10 "https://www.heise.de/en/news/Spotify-Co-CEO-Top-developers-no-longer-write-code-thanks-to-AI-11176416.html" "heise: Spotify top developers no longer write code"
+  click E11 "https://metr.org/time-horizons/" "METR time horizons"
+  click E12 "https://metr.org/blog/2026-02-24-uplift-update/" "METR developer productivity update"
+  click E13 "https://hbr.org/2025/09/ai-generated-workslop-is-destroying-productivity" "HBR: Workslop"
+  click E14 "https://arxiv.org/abs/2604.03486" "VisionClaw: Always-On AI Agents through Smart Glasses"
+  click E15 "https://www.mckinsey.com/capabilities/mckinsey-technology/our-insights/reimagining-tech-infrastructure-for-and-with-agentic-ai" "McKinsey: Agentic AI infrastructure"
+
+  %% Quick source catalog for non-click renderers:
+  %% E1 OpenAI, 2026-05-14, Work with Codex from anywhere.
+  %% E2 Microsoft, 2025-09-29, Vibe working in Microsoft 365 Copilot.
+  %% E3 Microsoft WorkLab, 2026, four human-agent collaboration patterns.
+  %% E4 Microsoft Work Trend Index 2026, agents and human agency.
+  %% E5 Microsoft Agent 365, 2025-11-18, control plane for AI agents.
+  %% E6 Axios, 2026-05-05, software evolves from UI to APIs/data/permissions for agents.
+  %% E7 MCP docs and Anthropic MCP announcement, open standard for connecting AI apps to external systems.
+  %% E8 Fortune, 2026-03-21, Karpathy says he has not typed a line of code since Dec 2025.
+  %% E9 Fortune, 2026-01-29, Anthropic/OpenAI engineers report high AI-written code share.
+  %% E10 heise, 2026-02-13, Spotify top developers generate and monitor code rather than handwrite it.
+  %% E11 METR, 2026-05-08 update, frontier AI task-completion time horizons.
+  %% E12 METR, 2026-02-24 update, productivity experiments and selection effects.
+  %% E13 HBR, 2025-09-22, AI-generated workslop and productivity tax.
+  %% E14 AP / Reuters / arXiv, 2025-2026, AI glasses and wearable agents.
+  %% E15 McKinsey, 2026, agentic infrastructure and governed automation.
