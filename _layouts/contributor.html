@@ -3,10 +3,14 @@ layout: default
 ---
 <div class="page-header">
   <div class="breadcrumb">
-    <a href="{{ site.baseurl }}/" data-i18n="home">首页</a> / {{ page.username }}
+    <a href="{{ site.baseurl }}/" data-i18n="home">首页</a> / {{ page.username | escape }}
   </div>
-  <a href="https://github.com/{{ page.username }}" class="github-link">@{{ page.username }}</a>
+  <a href="https://github.com/{{ page.username | url_encode }}" class="github-link">@{{ page.username | escape }}</a>
 </div>
+
+{% if page.about %}
+<p><a href="{{ site.baseurl }}/contributors/{{ page.username | url_encode }}/about/" data-i18n="about">关于</a></p>
+{% endif %}
 
 <div class="markdown-body">
   {{ content }}
@@ -18,8 +22,8 @@ layout: default
 <ul class="post-list">
   {% for post in page.posts %}
   <li>
-    <a href="{{ site.baseurl }}/contributors/{{ page.username }}/{{ post.slug }}/">{{ post.title }}</a>
-    {% if post.date %}<span class="post-date">{{ post.date }}</span>{% endif %}
+    <a href="{{ site.baseurl }}/contributors/{{ page.username | url_encode }}/{{ post.slug | url_encode }}/">{{ post.title | escape }}</a>
+    {% if post.date %}<span class="post-date">{{ post.date | escape }}</span>{% endif %}
   </li>
   {% endfor %}
 </ul>
@@ -27,11 +31,11 @@ layout: default
 
 {% if page.pages.size > 0 %}
 <hr style="margin: 2rem 0; border: none; border-top: 1px solid rgba(100, 180, 255, 0.1);">
-<h2>页面</h2>
+<h2 data-i18n="pages">页面</h2>
 <ul class="post-list">
   {% for item in page.pages %}
   <li>
-    <a href="{{ site.baseurl }}/contributors/{{ page.username }}/{{ item.path }}">{{ item.title }}</a>
+    <a href="{{ site.baseurl }}/contributors/{{ page.username | url_encode }}/{{ item.path | escape }}">{{ item.title | escape }}</a>
   </li>
   {% endfor %}
 </ul>

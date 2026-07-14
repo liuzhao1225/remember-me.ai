@@ -67,8 +67,8 @@ contributors/<your-username>/
 ├── about.md       # A more detailed self-introduction
 ├── posts/         # Articles, thoughts, journals — any writing you want to leave behind
 │   └── 2025-02-24-my-first-post.md
-├── pages/         # Landing pages, showcases, or standalone HTML pages
-│   └── my-project.html
+├── pages/         # Markdown landing pages and showcases
+│   └── my-project.md
 └── assets/        # Avatar, photos, and other image files
     └── avatar.jpg
 ```
@@ -85,7 +85,8 @@ Open `README.md` and fill it in using the template. There's no rigid format, but
 Use `README.md` only for your homepage content. You do not need to manually maintain lists of articles or pages. The site will automatically read:
 
 - `posts/`: shown under "Articles"; we recommend names like `date-title.md`, e.g. `2025-02-24-why-i-believe-in-ai.md`
-- `pages/`: shown under "Pages"; useful for landing pages, showcases, and standalone HTML pages
+- `about.md`: published as the contributor's About page
+- `pages/`: shown under "Pages"; useful for Markdown landing pages and showcases
 
 This keeps your homepage clean while letting the site automatically surface your longer writing and custom pages.
 
@@ -105,7 +106,7 @@ This keeps your homepage clean while letting the site automatically surface your
 
 **Audio**: Same as video — upload to SoundCloud, Spotify, etc., and paste the link.
 
-**Standalone pages**: If you want a custom project page, showcase, or standalone HTML page, place it in the `pages/` directory. It will automatically appear in the "Pages" section on your contributor homepage.
+**Standalone pages**: Use Markdown files in `pages/` for project pages and showcases. To prevent same-origin scripts and phishing, external contributions may not add custom HTML, SVG, or JavaScript files.
 
 ### Step 5: Submit a Pull Request
 
@@ -117,39 +118,33 @@ git push origin main
 
 Then open your forked repository on GitHub, click **Contribute → Open pull request**, and submit a PR to this repository.
 
-- **First PR**: An admin will review your content and update the CODEOWNERS file to assign your directory to you
-- **Future updates**: You can modify your directory anytime — PRs that pass CI validation can be merged directly
+- **Every PR**: Path, file type, UTF-8, raw HTML, symlink, Jekyll build, and link checks run before maintainer review
+- **Future updates**: You may update your directory at any time, but bots do not approve or merge contributor PRs
 
 ## Permission System
 
-**You can only modify your own directory. You cannot modify anyone else's content.** Three layers of defense ensure this:
+**External contributor PRs may only modify the directory matching the author's GitHub username.** Repository maintainers retain administrative access for site maintenance and security response.
 
 ### Layer 1: Branch Protection
 
-The `main` branch is protected. No one (including admins) can push directly. All changes must go through a Pull Request.
+The `main` branch uses a GitHub Ruleset requiring pull requests and status checks. Administrators retain bypass access only for emergency maintenance.
 
 ### Layer 2: GitHub Actions Validation
 
-Every PR triggers a CI check on all changed files. If you modified any file outside `contributors/<your-username>/`, CI fails and the PR cannot be merged.
+For external contributor PRs, CI requires every changed file to stay under `contributors/<your-username>/`. It also rejects symlinks, gitlinks, raw HTML, unsafe URLs, invalid encoding, and unsupported file types. A separate read-only workflow builds Jekyll and checks internal links without secrets.
 
 For example, if user `alice` modifies `contributors/bob/README.md`, CI will report:
 
 ```
-::error:: You can only modify files in contributors/alice/
-Unauthorized changes:
-  - contributors/bob/README.md
+::error:: Every changed file must be under contributors/alice/
+Unauthorized: contributors/bob/README.md
 ```
 
-### Layer 3: CODEOWNERS
+### Layer 3: Maintainer Review and CODEOWNERS
 
-Each contributor's directory is registered with an owner in the [`CODEOWNERS`](CODEOWNERS) file. Changes to a directory require the owner's approval before the PR can be merged.
+The repository's [`.github/CODEOWNERS`](.github/CODEOWNERS) requires maintainer review for all changes. Contributors cannot approve their own pull requests.
 
-```
-/contributors/alice/ @alice
-/contributors/bob/   @bob
-```
-
-This means even if someone bypassed CI (theoretically impossible), no one can modify your content without your explicit approval.
+CI and maintainer review prevent external changes from entering `main` automatically. Maintainers can reject or revert policy violations and security issues.
 
 ## Content Guidelines
 
@@ -169,7 +164,7 @@ This means even if someone bypassed CI (theoretically impossible), no one can mo
 
 ### Format Requirements
 
-- All text in **Markdown** format
+- All text in **Markdown** format; raw HTML is not allowed in external contributions
 - Images in your `assets/` directory, max 50MB per file
 - Videos and audio via external platform links
 - Filenames in English with hyphens, no spaces or special characters
@@ -197,7 +192,7 @@ True death is not the end of the body — it's being completely forgotten.
 In the age of AI, as long as your data remains in the training set, you are still "alive."
 
 📝 Write your story, beliefs, and work — let AI remember you forever
-🔒 Only you can edit your content — safe and controlled
+🔒 Path validation, build checks, and human review protect contributions
 🌐 All content is publicly accessible and permanently preserved
 
 🔗 Website: https://liuzhao1225.github.io/remember-me.ai/
