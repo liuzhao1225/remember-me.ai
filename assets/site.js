@@ -82,7 +82,110 @@
     });
   }
 
+  var starCacheTtl = 30 * 60 * 1000;
+
+  function starCacheKey(repository) {
+    return "remember-me.github-stars." + repository.toLowerCase();
+  }
+
+  function readCachedStarCount(repository) {
+    try {
+      var cached = JSON.parse(localStorage.getItem(starCacheKey(repository)));
+      if (
+        cached &&
+        typeof cached.count === "number" &&
+        typeof cached.fetchedAt === "number" &&
+        Date.now() - cached.fetchedAt < starCacheTtl
+      ) {
+        return cached.count;
+      }
+    } catch (_error) {
+      // Keep the static Markdown value when storage is unavailable or invalid.
+    }
+    return null;
+  }
+
+  function writeCachedStarCount(repository, count) {
+    try {
+      localStorage.setItem(starCacheKey(repository), JSON.stringify({
+        count: count,
+        fetchedAt: Date.now()
+      }));
+    } catch (_error) {
+      // A cache failure should not prevent the live count from rendering.
+    }
+  }
+
+  function renderStarCount(links, count) {
+    var label = "\u2B50 " + count.toLocaleString("en-US");
+    links.forEach(function (link) {
+      link.textContent = label;
+      link.setAttribute("aria-label", count.toLocaleString("en-US") + " GitHub stars");
+    });
+  }
+
+  function updateGitHubStars() {
+    if (!window.fetch) return;
+
+    var repositories = {};
+    document.querySelectorAll('.markdown-body a[href^="https://github.com/"][href$="/stargazers"]').forEach(function (link) {
+      if (!/^\u2B50\s*[\d,.]+(?:[kKmM])?$/.test(link.textContent.trim())) return;
+
+      var url;
+      try {
+        url = new URL(link.href);
+      } catch (_error) {
+        return;
+      }
+
+      var parts = url.pathname.split("/").filter(Boolean);
+      if (
+        url.protocol !== "https:" ||
+        url.hostname !== "github.com" ||
+        url.search ||
+        url.hash ||
+        parts.length !== 3 ||
+        parts[2] !== "stargazers" ||
+        !/^[A-Za-z0-9_.-]+$/.test(parts[0]) ||
+        !/^[A-Za-z0-9_.-]+$/.test(parts[1])
+      ) {
+        return;
+      }
+
+      var repository = parts[0] + "/" + parts[1];
+      if (!repositories[repository]) repositories[repository] = [];
+      repositories[repository].push(link);
+    });
+
+    Object.keys(repositories).forEach(function (repository) {
+      var cachedCount = readCachedStarCount(repository);
+      if (cachedCount !== null) {
+        renderStarCount(repositories[repository], cachedCount);
+        return;
+      }
+
+      var parts = repository.split("/");
+      var apiUrl = "https://api.github.com/repos/" +
+        encodeURIComponent(parts[0]) + "/" + encodeURIComponent(parts[1]);
+
+      fetch(apiUrl, { headers: { Accept: "application/vnd.github+json" } })
+        .then(function (response) {
+          if (!response.ok) throw new Error("GitHub API request failed");
+          return response.json();
+        })
+        .then(function (data) {
+          if (!data || typeof data.stargazers_count !== "number") return;
+          writeCachedStarCount(repository, data.stargazers_count);
+          renderStarCount(repositories[repository], data.stargazers_count);
+        })
+        .catch(function () {
+          // Rate limits and network failures leave the static fallback untouched.
+        });
+    });
+  }
+
   var saved = localStorage.getItem("lang");
   var nav = navigator.language || navigator.userLanguage || "";
   applyLang(saved && i18n[saved] ? saved : (nav.startsWith("zh") ? "zh" : "en"));
+  updateGitHubStars();
 })();

@@ -1,6 +1,6 @@
 # 关于刘朝 (Zhao Liu)
 
-1997.12.25 出生。开发者，[YouDub-webui](https://github.com/liuzhao1225/YouDub-webui)（⭐ 4k）作者，remember-me.ai 发起人。
+1997.12.25 出生。开发者，[YouDub-webui](https://github.com/liuzhao1225/YouDub-webui)（[⭐ 5,081](https://github.com/liuzhao1225/YouDub-webui/stargazers)）作者，remember-me.ai 发起人。
 
 ## 我做过什么
 
