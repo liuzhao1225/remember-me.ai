@@ -10,26 +10,26 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      color-scheme: light;
-      --bg-deep: #f4f7fb;
-      --bg-mid: #ffffff;
-      --bg-surface: rgba(255, 255, 255, 0.88);
-      --bg-surface-hover: #ffffff;
-      --border-subtle: #d7dee8;
-      --border-hover: #94a3b8;
-      --text-primary: #172033;
-      --text-secondary: #475569;
-      --text-muted: #64748b;
-      --accent-primary: #1d4ed8;
-      --accent-secondary: #1e3a8a;
-      --accent-dim: #eff6ff;
-      --glow-soft: 0 12px 30px rgba(15, 23, 42, 0.10);
+      color-scheme: dark;
+      --bg-deep: #000000;
+      --bg-mid: #0a0a0a;
+      --bg-surface: rgba(255, 255, 255, 0.06);
+      --bg-surface-hover: rgba(255, 255, 255, 0.10);
+      --border-subtle: rgba(255, 255, 255, 0.12);
+      --border-hover: rgba(255, 255, 255, 0.25);
+      --text-primary: #f0f0f0;
+      --text-secondary: #999999;
+      --text-muted: #666666;
+      --accent-primary: #ffffff;
+      --accent-secondary: #cccccc;
+      --accent-dim: rgba(255, 255, 255, 0.08);
+      --glow-soft: 0 0 20px rgba(255, 255, 255, 0.08);
     }
 
     html {
       overflow-y: scroll;
       scrollbar-gutter: stable;
-      scrollbar-color: #94a3b8 #e7edf5;
+      scrollbar-color: rgba(255, 255, 255, 0.28) var(--bg-deep);
     }
 
     body {
@@ -38,40 +38,25 @@
       color: var(--text-primary);
       position: relative;
       isolation: isolate;
-      background:
-        radial-gradient(circle at 12% 8%, rgba(96, 165, 250, 0.14), transparent 28rem),
-        radial-gradient(circle at 88% 22%, rgba(129, 140, 248, 0.10), transparent 24rem),
-        radial-gradient(circle at 48% 82%, rgba(56, 189, 248, 0.07), transparent 30rem),
-        linear-gradient(180deg, #ffffff 0%, var(--bg-deep) 100%);
+      background: var(--bg-deep);
       min-height: 100vh;
       overflow-x: hidden;
     }
 
-    /* Low-frequency star drift: one CSS layer, no canvas or JavaScript loop. */
-    body::before {
-      content: "";
+    #cosmos-canvas {
       position: fixed;
       inset: 0;
       z-index: 0;
       pointer-events: none;
-      background-image:
-        radial-gradient(circle, rgba(30, 64, 175, 0.28) 0 1px, transparent 1.25px),
-        radial-gradient(circle, rgba(59, 130, 246, 0.18) 0 1px, transparent 1.25px),
-        radial-gradient(circle, rgba(99, 102, 241, 0.13) 0 1.5px, transparent 1.8px);
-      background-size: 83px 83px, 137px 137px, 223px 223px;
-      background-position: 17px 23px, 61px 79px, 113px 31px;
-      background-repeat: repeat;
-      opacity: 0.72;
-      animation: starfield-drift 90s steps(180, end) infinite;
+      overflow: hidden;
+      contain: strict;
+      background: var(--bg-deep);
     }
 
-    @keyframes starfield-drift {
-      from {
-        background-position: 17px 23px, 61px 79px, 113px 31px;
-      }
-      to {
-        background-position: 100px 106px, -76px 216px, 336px -192px;
-      }
+    #cosmos-canvas canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
     }
 
     .page-shell {
@@ -86,13 +71,13 @@
     a:hover { color: var(--accent-secondary); text-decoration: none; }
     a:focus-visible,
     button:focus-visible {
-      outline: 3px solid rgba(37, 99, 235, 0.35);
+      outline: 3px solid rgba(255, 255, 255, 0.45);
       outline-offset: 3px;
     }
 
     .site-header {
       border-bottom: 1px solid var(--border-subtle);
-      background: rgba(255, 255, 255, 0.88);
+      background: rgba(0, 0, 0, 0.72);
       padding: 1rem 0;
       position: sticky;
       top: 0;
@@ -138,7 +123,7 @@
       text-align: center;
       color: var(--text-muted);
       font-size: 0.85rem;
-      background: rgba(255, 255, 255, 0.72);
+      background: rgba(0, 0, 0, 0.72);
     }
 
     /* Markdown content */
@@ -172,7 +157,7 @@
       border-radius: 0 6px 6px 0;
     }
     .markdown-body code {
-      background: #eef2f7;
+      background: rgba(255, 255, 255, 0.08);
       padding: 0.15rem 0.4rem;
       border-radius: 3px;
       font-size: 0.9em;
@@ -180,7 +165,7 @@
       border: 1px solid var(--border-subtle);
     }
     .markdown-body pre {
-      background: #f8fafc;
+      background: rgba(0, 0, 0, 0.5);
       border: 1px solid var(--border-subtle);
       padding: 1rem;
       border-radius: 8px;
@@ -243,7 +228,7 @@
       left: 0;
       right: 0;
       height: 1px;
-      background: linear-gradient(90deg, transparent, rgba(37, 99, 235, 0.45), transparent);
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
       opacity: 0;
       transition: opacity 0.4s;
     }
@@ -307,7 +292,7 @@
       margin-top: 1.5rem;
       padding: 0.7rem 2rem;
       background: var(--accent-primary);
-      color: #ffffff;
+      color: #000000;
       border-radius: 8px;
       font-size: 0.95rem;
       font-weight: 600;
@@ -315,8 +300,8 @@
       letter-spacing: 0.02em;
     }
     .hero .cta:hover {
-      box-shadow: 0 4px 20px rgba(29, 78, 216, 0.24);
-      color: #ffffff;
+      box-shadow: 0 4px 20px rgba(255, 255, 255, 0.18);
+      color: #000000;
       text-decoration: none;
     }
 
@@ -331,13 +316,13 @@
     .markdown-body a {
       color: var(--accent-primary);
       text-decoration: underline;
-      text-decoration-color: rgba(29, 78, 216, 0.35);
+      text-decoration-color: rgba(255, 255, 255, 0.35);
       text-underline-offset: 2px;
       transition: opacity 0.3s, text-decoration-color 0.3s;
     }
     .markdown-body a:hover {
       opacity: 0.7;
-      text-decoration-color: rgba(29, 78, 216, 0.72);
+      text-decoration-color: rgba(255, 255, 255, 0.72);
     }
 
     /* Post list in contributor page */
@@ -356,13 +341,13 @@
     .post-list li a {
       color: var(--accent-primary);
       text-decoration: underline;
-      text-decoration-color: rgba(29, 78, 216, 0.35);
+      text-decoration-color: rgba(255, 255, 255, 0.35);
       text-underline-offset: 2px;
       transition: opacity 0.3s, text-decoration-color 0.3s;
     }
     .post-list li a:hover {
       opacity: 0.7;
-      text-decoration-color: rgba(29, 78, 216, 0.72);
+      text-decoration-color: rgba(255, 255, 255, 0.72);
     }
     .post-list .post-date {
       color: var(--text-muted);
@@ -410,7 +395,7 @@
       margin-top: 1rem;
       padding: 0.4rem 1.2rem;
       background: var(--accent-primary);
-      color: #ffffff;
+      color: #000000;
       border: none;
       border-radius: 6px;
       font-size: 0.85rem;
@@ -420,7 +405,7 @@
       letter-spacing: 0.02em;
     }
     .copy-btn:hover {
-      box-shadow: 0 4px 16px rgba(29, 78, 216, 0.22);
+      box-shadow: 0 4px 16px rgba(255, 255, 255, 0.16);
     }
 
     /* Language toggle */
@@ -440,37 +425,28 @@
 
     /* Selection color */
     ::selection {
-      background: #bfdbfe;
-      color: #172033;
+      background: rgba(255, 255, 255, 0.24);
+      color: #ffffff;
     }
 
     /* Scrollbar */
     ::-webkit-scrollbar { width: 12px; }
-    ::-webkit-scrollbar-track { background: #e7edf5; }
+    ::-webkit-scrollbar-track { background: var(--bg-deep); }
     ::-webkit-scrollbar-thumb {
-      background: #94a3b8;
-      border: 3px solid #e7edf5;
+      background: rgba(255, 255, 255, 0.28);
+      border: 3px solid var(--bg-deep);
       border-radius: 999px;
     }
-    ::-webkit-scrollbar-thumb:hover { background: #64748b; }
-
-    @media (max-width: 640px) {
-      body::before {
-        opacity: 0.64;
-        animation: starfield-drift 120s steps(120, end) infinite;
-      }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      body::before { animation: none; }
-    }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.42); }
 
     @media print {
-      body::before { display: none; }
+      #cosmos-canvas { display: none; }
     }
   </style>
 </head>
 <body>
+  <div id="cosmos-canvas" aria-hidden="true"></div>
+
   <div class="page-shell">
     <header class="site-header">
       <div class="wrapper">
@@ -495,6 +471,7 @@
     </footer>
   </div>
 
+  <script src="{{ site.baseurl }}/assets/cosmos.js" defer></script>
   <script src="{{ site.baseurl }}/assets/site.js" defer></script>
 </body>
 </html>
