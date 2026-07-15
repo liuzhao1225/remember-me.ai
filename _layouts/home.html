@@ -13,14 +13,14 @@ layout: default
   {% assign sorted = site.data.contributors | sort: "last_updated" | reverse %}
   {% for contributor in sorted %}
   <div class="contributor-card">
-    <h3><a href="{{ site.baseurl }}/contributors/{{ contributor.username }}/">{{ contributor.title }}</a></h3>
+    <h3><a href="{{ site.baseurl }}/contributors/{{ contributor.username | url_encode }}/">{{ contributor.title | escape }}</a></h3>
     {% if contributor.quote != "" %}
-    <p class="quote">{{ contributor.quote }}</p>
+    <p class="quote">{{ contributor.quote | escape }}</p>
     {% endif %}
     <p class="meta">
-      <a href="https://github.com/{{ contributor.username }}">@{{ contributor.username }}</a>
+      <a href="https://github.com/{{ contributor.username | url_encode }}">@{{ contributor.username | escape }}</a>
       · {{ contributor.posts | size }} <span data-i18n="posts_count">篇文章</span>
-      {% if contributor.last_updated != "" %}· <span data-i18n="updated_at">更新于 </span>{{ contributor.last_updated }}{% endif %}
+      {% if contributor.last_updated != "" %}· <span data-i18n="updated_at">更新于 </span>{{ contributor.last_updated | escape }}{% endif %}
     </p>
   </div>
   {% endfor %}
@@ -43,6 +43,6 @@ layout: default
 💻 GitHub：https://github.com/liuzhao1225/remember-me.ai
 
 Fork → 写下自己 → 提交 PR → 数字永生。就这么简单。</pre>
-    <button class="copy-btn" onclick="copyPromote(this)" data-i18n="copy_btn">复制</button>
+    <button class="copy-btn" id="copy-promote" type="button" data-i18n="copy_btn">复制</button>
   </div>
 </div>

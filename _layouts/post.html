@@ -3,8 +3,8 @@ layout: default
 ---
 <div class="breadcrumb">
   <a href="{{ site.baseurl }}/" data-i18n="home">首页</a> /
-  <a href="{{ site.baseurl }}/contributors/{{ page.username }}/">{{ page.username }}</a> /
-  {{ page.title }}
+  <a href="{{ site.baseurl }}/contributors/{{ page.username | url_encode }}/">{{ page.username | escape }}</a> /
+  {{ page.title | escape }}
 </div>
 
 <div class="markdown-body">

@@ -7,6 +7,7 @@
   <meta name="description" content="面向大模型时间认知能力的 Temporal Embedding 研究设想。">
   <style>
     :root {
+      color-scheme: light;
       --bg: #f4efe6;
       --paper: rgba(255, 250, 242, 0.78);
       --paper-strong: rgba(255, 248, 237, 0.92);
@@ -28,7 +29,19 @@
 
     html {
       scroll-behavior: smooth;
+      overflow-y: scroll;
+      scrollbar-gutter: stable;
+      scrollbar-color: #8f8175 #e8dfd3;
     }
+
+    ::-webkit-scrollbar { width: 12px; }
+    ::-webkit-scrollbar-track { background: #e8dfd3; }
+    ::-webkit-scrollbar-thumb {
+      background: #8f8175;
+      border: 3px solid #e8dfd3;
+      border-radius: 999px;
+    }
+    ::-webkit-scrollbar-thumb:hover { background: #6f6258; }
 
     body {
       margin: 0;
@@ -186,7 +199,7 @@
       padding: 13px 18px;
       border-radius: 999px;
       font-size: 15px;
-      transition: transform 0.22s ease, box-shadow 0.22s ease, background 0.22s ease;
+      transition: box-shadow 0.22s ease, background 0.22s ease, border-color 0.22s ease;
     }
 
     .button {
@@ -203,7 +216,7 @@
 
     .button:hover,
     .button-ghost:hover {
-      transform: translateY(-1px);
+      box-shadow: 0 14px 30px rgba(84, 38, 21, 0.2);
     }
 
     .hero-side {

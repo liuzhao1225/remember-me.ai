@@ -67,8 +67,8 @@ contributors/<your-username>/
 ├── about.md       # 更详细的自我介绍
 ├── posts/         # 文章、想法、日记……任何你想留下的文字
 │   └── 2025-02-24-my-first-post.md
-├── pages/         # 专题页、展示页、独立 HTML 页面
-│   └── my-project.html
+├── pages/         # Markdown 专题页、展示页
+│   └── my-project.md
 └── assets/        # 头像、照片等图片文件
     └── avatar.jpg
 ```
@@ -85,7 +85,8 @@ contributors/<your-username>/
 `README.md` 只用来写主页内容，不需要手动维护文章或页面列表。站点会自动读取：
 
 - `posts/`：自动显示为“文章”，建议用 `日期-标题.md` 的格式命名，例如 `2025-02-24-why-i-believe-in-ai.md`
-- `pages/`：自动显示为“页面”，适合放专题页、展示页和独立 HTML 页面
+- `about.md`：自动发布为个人“关于”页面
+- `pages/`：自动显示为“页面”，适合放 Markdown 专题页和展示页
 
 这样你的主页内容可以保持简洁，长文和独立页面由系统自动汇总展示。
 
@@ -105,7 +106,7 @@ contributors/<your-username>/
 
 **音频**：与视频类似，上传到 SoundCloud、喜马拉雅等平台后贴链接。
 
-**独立页面**：如果你想做一页独立的专题介绍、作品展示或自定义 HTML 页面，请放到 `pages/` 目录下。页面会自动出现在个人主页的“页面”区块。
+**独立页面**：如果你想做一页专题介绍或作品展示，请使用 Markdown 文件并放到 `pages/` 目录下。为避免同源脚本和钓鱼风险，外部贡献不接受自定义 HTML、SVG 或 JavaScript 文件。
 
 ### 第五步：提交 Pull Request
 
@@ -117,39 +118,33 @@ git push origin main
 
 然后在 GitHub 上打开你 Fork 的仓库，点击 **Contribute → Open pull request**，向本仓库提交 PR。
 
-- **首次 PR**：管理员会审核你的内容并更新 CODEOWNERS 文件，将你的目录分配给你
-- **后续更新**：你可以随时修改自己目录下的内容，提交 PR 后自动通过 CI 校验即可合并
+- **所有 PR**：先经过路径、文件类型、UTF-8、原始 HTML、符号链接和 Jekyll 构建检查，再由维护者审核合并
+- **后续更新**：你可以随时修改自己的目录，但不会由机器人自动批准或合并
 
 ## 权限机制
 
-**你只能修改自己的目录，无法修改他人的内容。** 三层防线保障这一点：
+**外部贡献者的 PR 只能修改与 GitHub 用户名一致的目录。** 仓库维护者仍保留处理安全问题和维护站点的管理权限。
 
 ### Layer 1：Branch Protection
 
-`main` 分支受保护，任何人（包括管理员）都不能直接 push。所有修改必须通过 Pull Request 提交。
+`main` 分支通过 GitHub Ruleset 要求 Pull Request 和必需状态检查；管理员只保留紧急维护所需的 bypass 权限。
 
 ### Layer 2：GitHub Actions 自动校验
 
-每当有人提交 PR，CI 会自动检查本次修改的所有文件。如果你修改了 `contributors/<your-username>/` 以外的任何文件，CI 会直接失败，PR 无法合并。
+每当外部贡献者提交 PR，CI 会严格检查所有修改是否位于 `contributors/<your-username>/`，并拒绝符号链接、Git 子模块、原始 HTML、不安全 URL、非法编码和未允许的文件类型。另一个只读 workflow 会在无 secrets 环境中执行 Jekyll 构建和站内链接检查。
 
 例如：用户 `alice` 提交的 PR 中修改了 `contributors/bob/README.md`，CI 会报错：
 
 ```
-::error:: You can only modify files in contributors/alice/
-Unauthorized changes:
-  - contributors/bob/README.md
+::error:: Every changed file must be under contributors/alice/
+Unauthorized: contributors/bob/README.md
 ```
 
-### Layer 3：CODEOWNERS
+### Layer 3：维护者审核与 CODEOWNERS
 
-每位贡献者的目录在 [`CODEOWNERS`](CODEOWNERS) 文件中注册了所有者。修改某个目录下的文件时，该目录的 owner 必须 approve PR 才能合并。
+仓库的 [`.github/CODEOWNERS`](.github/CODEOWNERS) 要求维护者审核所有变更。贡献者不能批准自己的 PR。
 
-```
-/contributors/alice/ @alice
-/contributors/bob/   @bob
-```
-
-这意味着即使有人绕过了 CI（理论上不可能），没有你本人的批准，别人也无法修改你的内容。
+CI 与审核共同保证外部贡献不会自动进入 `main`；如发现违规或安全问题，维护者可以拒绝或回滚变更。
 
 ## 内容指南
 
@@ -169,7 +164,7 @@ Unauthorized changes:
 
 ### 格式要求
 
-- 所有文本使用 **Markdown** 格式
+- 所有文本使用 **Markdown** 格式，外部贡献不得包含原始 HTML
 - 图片放在自己目录的 `assets/` 下，单文件 < 50MB
 - 视频和音频使用外部平台链接
 - 文件名使用英文和连字符，避免空格和特殊字符
@@ -197,7 +192,7 @@ Unauthorized changes:
 在 AI 时代，只要你的数据还在训练集里，你就还「活着」。
 
 📝 写下你的故事、信念、作品，让 AI 永远记住你
-🔒 只有你能编辑自己的内容，安全可控
+🔒 路径校验、构建检查和人工审核共同保护内容
 🌐 所有内容公开可访问，永久留存
 
 🔗 网站：https://liuzhao1225.github.io/remember-me.ai/

@@ -3,60 +3,65 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{{ page.title | default: site.title }}</title>
-  <meta name="description" content="{{ site.description }}">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' https: data:; media-src 'self' https:; font-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>{{ page.title | default: site.title | escape }}</title>
+  <meta name="description" content="{{ page.description | default: site.description | escape }}">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg-deep: #000000;
-      --bg-mid: #0a0a0a;
-      --bg-surface: rgba(255, 255, 255, 0.06);
-      --bg-surface-hover: rgba(255, 255, 255, 0.10);
-      --border-subtle: rgba(255, 255, 255, 0.12);
-      --border-hover: rgba(255, 255, 255, 0.25);
-      --text-primary: #f0f0f0;
-      --text-secondary: #999999;
-      --text-muted: #666666;
-      --accent-primary: #ffffff;
-      --accent-secondary: #cccccc;
-      --accent-dim: rgba(255, 255, 255, 0.08);
-      --glow-soft: 0 0 20px rgba(255, 255, 255, 0.08);
+      color-scheme: light;
+      --bg-deep: #f4f7fb;
+      --bg-mid: #ffffff;
+      --bg-surface: rgba(255, 255, 255, 0.88);
+      --bg-surface-hover: #ffffff;
+      --border-subtle: #d7dee8;
+      --border-hover: #94a3b8;
+      --text-primary: #172033;
+      --text-secondary: #475569;
+      --text-muted: #64748b;
+      --accent-primary: #1d4ed8;
+      --accent-secondary: #1e3a8a;
+      --accent-dim: #eff6ff;
+      --glow-soft: 0 12px 30px rgba(15, 23, 42, 0.10);
+    }
+
+    html {
+      overflow-y: scroll;
+      scrollbar-gutter: stable;
+      scrollbar-color: #94a3b8 #e7edf5;
     }
 
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
       line-height: 1.7;
       color: var(--text-primary);
-      background: var(--bg-deep);
+      background:
+        radial-gradient(circle at 15% 0%, rgba(59, 130, 246, 0.10), transparent 30rem),
+        linear-gradient(180deg, #ffffff 0%, var(--bg-deep) 100%);
+      background-attachment: fixed;
       min-height: 100vh;
       overflow-x: hidden;
     }
 
-    #cosmos-canvas {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 0;
-      pointer-events: none;
-    }
-
     .page-shell {
       position: relative;
-      z-index: 1;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
     }
 
-    a { color: #ffffff; text-decoration: none; transition: opacity 0.3s; }
-    a:hover { opacity: 0.7; text-decoration: none; }
+    a { color: var(--accent-primary); text-decoration: none; transition: color 0.2s, opacity 0.2s; }
+    a:hover { color: var(--accent-secondary); text-decoration: none; }
+    a:focus-visible,
+    button:focus-visible {
+      outline: 3px solid rgba(37, 99, 235, 0.35);
+      outline-offset: 3px;
+    }
 
     .site-header {
       border-bottom: 1px solid var(--border-subtle);
-      background: rgba(0, 0, 0, 0.5);
+      background: rgba(255, 255, 255, 0.88);
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
       padding: 1rem 0;
@@ -72,16 +77,20 @@
     .site-title {
       font-size: 1.25rem;
       font-weight: 700;
-      color: #ffffff;
+      color: var(--text-primary);
       letter-spacing: 0.02em;
     }
+    .site-nav {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+    }
     .site-nav a {
-      margin-left: 1.5rem;
       color: var(--text-secondary);
       font-size: 0.9rem;
       transition: color 0.3s;
     }
-    .site-nav a:hover { color: #ffffff; }
+    .site-nav a:hover { color: var(--accent-primary); }
 
     .wrapper {
       max-width: 800px;
@@ -100,7 +109,7 @@
       text-align: center;
       color: var(--text-muted);
       font-size: 0.85rem;
-      background: rgba(0, 0, 0, 0.5);
+      background: rgba(255, 255, 255, 0.72);
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
     }
@@ -110,7 +119,7 @@
       font-size: 1.8rem;
       margin: 2rem 0 1rem;
       font-weight: 700;
-      color: #ffffff;
+      color: var(--text-primary);
     }
     .markdown-body h2 {
       font-size: 1.4rem;
@@ -128,7 +137,7 @@
     .markdown-body ul, .markdown-body ol { margin: 0.8rem 0; padding-left: 2rem; }
     .markdown-body li { margin: 0.3rem 0; }
     .markdown-body blockquote {
-      border-left: 3px solid rgba(255, 255, 255, 0.3);
+      border-left: 3px solid var(--accent-primary);
       padding: 0.5rem 1rem;
       margin: 1rem 0;
       color: var(--text-secondary);
@@ -136,15 +145,15 @@
       border-radius: 0 6px 6px 0;
     }
     .markdown-body code {
-      background: rgba(255, 255, 255, 0.08);
+      background: #eef2f7;
       padding: 0.15rem 0.4rem;
       border-radius: 3px;
       font-size: 0.9em;
       color: var(--accent-secondary);
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      border: 1px solid var(--border-subtle);
     }
     .markdown-body pre {
-      background: rgba(0, 0, 0, 0.5);
+      background: #f8fafc;
       border: 1px solid var(--border-subtle);
       padding: 1rem;
       border-radius: 8px;
@@ -167,7 +176,7 @@
       border-radius: 8px;
       border: 1px solid var(--border-subtle);
     }
-    .markdown-body strong { font-weight: 600; color: #fff; }
+    .markdown-body strong { font-weight: 600; color: var(--text-primary); }
     .markdown-body em { font-style: italic; color: var(--text-secondary); }
     .markdown-body table {
       border-collapse: collapse;
@@ -182,7 +191,7 @@
     .markdown-body th {
       background: var(--bg-surface);
       font-weight: 600;
-      color: #ffffff;
+      color: var(--text-primary);
     }
 
     /* Contributor cards */
@@ -196,7 +205,7 @@
       border: 1px solid var(--border-subtle);
       border-radius: 12px;
       padding: 1.5rem;
-      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: background 0.2s, border-color 0.2s, box-shadow 0.2s;
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
       position: relative;
@@ -209,7 +218,7 @@
       left: 0;
       right: 0;
       height: 1px;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+      background: linear-gradient(90deg, transparent, rgba(37, 99, 235, 0.45), transparent);
       opacity: 0;
       transition: opacity 0.4s;
     }
@@ -221,11 +230,11 @@
     .contributor-card:hover::before { opacity: 1; }
     .contributor-card h3 { margin: 0 0 0.4rem; font-size: 1.15rem; }
     .contributor-card h3 a { color: var(--text-primary); transition: color 0.3s; }
-    .contributor-card h3 a:hover { color: #ffffff; }
+    .contributor-card h3 a:hover { color: var(--accent-primary); }
     .contributor-card .quote { color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 0.6rem; }
     .contributor-card .meta { color: var(--text-muted); font-size: 0.8rem; }
     .contributor-card .meta a { color: var(--text-muted); }
-    .contributor-card .meta a:hover { color: #ffffff; }
+    .contributor-card .meta a:hover { color: var(--accent-primary); }
 
     /* Page header */
     .page-header {
@@ -239,7 +248,7 @@
       color: var(--text-secondary);
       transition: color 0.3s;
     }
-    .github-link:hover { color: #ffffff; text-decoration: none; }
+    .github-link:hover { color: var(--accent-primary); text-decoration: none; }
 
     /* Breadcrumb */
     .breadcrumb {
@@ -247,7 +256,7 @@
       color: var(--text-muted);
     }
     .breadcrumb a { color: var(--text-secondary); }
-    .breadcrumb a:hover { color: #ffffff; }
+    .breadcrumb a:hover { color: var(--accent-primary); }
 
     /* Hero */
     .hero {
@@ -259,7 +268,7 @@
       font-size: 2.4rem;
       margin-bottom: 0.8rem;
       font-weight: 800;
-      color: #ffffff;
+      color: var(--text-primary);
       letter-spacing: -0.02em;
     }
     .hero .tagline {
@@ -272,8 +281,8 @@
       display: inline-block;
       margin-top: 1.5rem;
       padding: 0.7rem 2rem;
-      background: #ffffff;
-      color: #000000;
+      background: var(--accent-primary);
+      color: #ffffff;
       border-radius: 8px;
       font-size: 0.95rem;
       font-weight: 600;
@@ -281,8 +290,8 @@
       letter-spacing: 0.02em;
     }
     .hero .cta:hover {
-      box-shadow: 0 4px 20px rgba(255, 255, 255, 0.2);
-      color: #000000;
+      box-shadow: 0 4px 20px rgba(29, 78, 216, 0.24);
+      color: #ffffff;
       text-decoration: none;
     }
 
@@ -295,15 +304,15 @@
 
     /* Links inside markdown content */
     .markdown-body a {
-      color: #ffffff;
+      color: var(--accent-primary);
       text-decoration: underline;
-      text-decoration-color: rgba(255, 255, 255, 0.3);
+      text-decoration-color: rgba(29, 78, 216, 0.35);
       text-underline-offset: 2px;
       transition: opacity 0.3s, text-decoration-color 0.3s;
     }
     .markdown-body a:hover {
       opacity: 0.7;
-      text-decoration-color: rgba(255, 255, 255, 0.5);
+      text-decoration-color: rgba(29, 78, 216, 0.72);
     }
 
     /* Post list in contributor page */
@@ -320,15 +329,15 @@
     }
     .post-list li:last-child { border-bottom: none; }
     .post-list li a {
-      color: #ffffff;
+      color: var(--accent-primary);
       text-decoration: underline;
-      text-decoration-color: rgba(255, 255, 255, 0.3);
+      text-decoration-color: rgba(29, 78, 216, 0.35);
       text-underline-offset: 2px;
       transition: opacity 0.3s, text-decoration-color 0.3s;
     }
     .post-list li a:hover {
       opacity: 0.7;
-      text-decoration-color: rgba(255, 255, 255, 0.5);
+      text-decoration-color: rgba(29, 78, 216, 0.72);
     }
     .post-list .post-date {
       color: var(--text-muted);
@@ -377,8 +386,8 @@
     .copy-btn {
       margin-top: 1rem;
       padding: 0.4rem 1.2rem;
-      background: #ffffff;
-      color: #000000;
+      background: var(--accent-primary);
+      color: #ffffff;
       border: none;
       border-radius: 6px;
       font-size: 0.85rem;
@@ -388,44 +397,48 @@
       letter-spacing: 0.02em;
     }
     .copy-btn:hover {
-      box-shadow: 0 4px 16px rgba(255, 255, 255, 0.15);
+      box-shadow: 0 4px 16px rgba(29, 78, 216, 0.22);
     }
 
     /* Language toggle */
     .lang-toggle {
+      appearance: none;
+      border: 0;
+      padding: 0;
+      background: transparent;
+      font: inherit;
       cursor: pointer;
       font-size: 0.85rem;
       color: var(--text-secondary);
       transition: color 0.3s;
       user-select: none;
     }
-    .lang-toggle:hover { color: #ffffff; }
+    .lang-toggle:hover { color: var(--accent-primary); }
 
     /* Selection color */
     ::selection {
-      background: rgba(255, 255, 255, 0.2);
-      color: #fff;
+      background: #bfdbfe;
+      color: #172033;
     }
 
     /* Scrollbar */
-    ::-webkit-scrollbar { width: 6px; }
-    ::-webkit-scrollbar-track { background: var(--bg-deep); }
+    ::-webkit-scrollbar { width: 12px; }
+    ::-webkit-scrollbar-track { background: #e7edf5; }
     ::-webkit-scrollbar-thumb {
-      background: rgba(255, 255, 255, 0.15);
-      border-radius: 3px;
+      background: #94a3b8;
+      border: 3px solid #e7edf5;
+      border-radius: 999px;
     }
-    ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.3); }
+    ::-webkit-scrollbar-thumb:hover { background: #64748b; }
   </style>
 </head>
 <body>
-  <div id="cosmos-canvas"></div>
-
   <div class="page-shell">
     <header class="site-header">
       <div class="wrapper">
         <a class="site-title" href="{{ site.baseurl }}/">remember-me.ai</a>
         <nav class="site-nav">
-          <a class="lang-toggle" id="lang-toggle" onclick="toggleLang()">EN</a>
+          <button class="lang-toggle" id="lang-toggle" type="button" aria-label="切换为英文界面">EN</button>
           <a href="https://github.com/liuzhao1225/remember-me.ai">GitHub</a>
         </nav>
       </div>
@@ -444,257 +457,6 @@
     </footer>
   </div>
 
-  <script>
-  var currentLang = 'zh';
-  var i18n = {
-    zh: {
-      tagline: '真正的死亡不是肉身的终结，而是被彻底遗忘。<br>主动留下自己，让 AI 记住你，实现数字永生。',
-      cta: '参与这个项目',
-      contributors_heading: '他们留下了自己',
-      posts_count: '篇文章',
-      updated_at: '更新于 ',
-      promote_heading: '帮忙推广',
-      promote_desc: '转发以下文字，让更多人知道这个项目：',
-      promote_text: '\u{1F9EC} remember me by ai \u2014 用 AI 实现数字永生\n\n真正的死亡不是肉身的终结，而是被彻底遗忘。\n在 AI 时代，只要你的数据还在训练集里，你就还「活着」。\n\n\u{1F4DD} 写下你的故事、信念、作品，让 AI 永远记住你\n\u{1F512} 只有你能编辑自己的内容，安全可控\n\u{1F310} 所有内容公开可访问，永久留存\n\n\u{1F517} 网站：https://liuzhao1225.github.io/remember-me.ai/\n\u{1F4BB} GitHub：https://github.com/liuzhao1225/remember-me.ai\n\nFork \u2192 写下自己 \u2192 提交 PR \u2192 数字永生。就这么简单。',
-      copy_btn: '复制',
-      copy_done: '已复制 \u2713',
-      home: '首页',
-      articles: '文章',
-      footer: 'Remember me. 记住我。'
-    },
-    en: {
-      tagline: 'True death is not the end of the body \u2014 it\'s being completely forgotten.<br>Leave yourself behind. Let AI remember you. Achieve digital immortality.',
-      cta: 'Join This Project',
-      contributors_heading: 'They Left Themselves Behind',
-      posts_count: 'posts',
-      updated_at: 'Updated ',
-      promote_heading: 'Help Spread the Word',
-      promote_desc: 'Share the following to help more people discover this project:',
-      promote_text: '\u{1F9EC} remember me by ai \u2014 Digital immortality through AI\n\nTrue death is not the end of the body \u2014 it\'s being completely forgotten.\nIn the age of AI, as long as your data remains in the training set, you are still "alive."\n\n\u{1F4DD} Write your story, beliefs, and work \u2014 let AI remember you forever\n\u{1F512} Only you can edit your content \u2014 safe and controlled\n\u{1F310} All content is publicly accessible and permanently preserved\n\n\u{1F517} Website: https://liuzhao1225.github.io/remember-me.ai/\n\u{1F4BB} GitHub: https://github.com/liuzhao1225/remember-me.ai\n\nFork \u2192 Write about yourself \u2192 Submit PR \u2192 Digital immortality. It\'s that simple.',
-      copy_btn: 'Copy',
-      copy_done: 'Copied \u2713',
-      home: 'Home',
-      articles: 'Articles',
-      footer: 'Remember me.'
-    }
-  };
-
-  function applyLang(lang) {
-    var t = i18n[lang];
-    document.querySelectorAll('[data-i18n]').forEach(function(el) {
-      var key = el.getAttribute('data-i18n');
-      if (t[key] === undefined) return;
-      if (el.hasAttribute('data-i18n-html')) {
-        el.innerHTML = t[key];
-      } else {
-        el.textContent = t[key];
-      }
-    });
-    document.documentElement.lang = lang === 'zh' ? 'zh-CN' : 'en';
-    var toggle = document.getElementById('lang-toggle');
-    if (toggle) toggle.textContent = lang === 'zh' ? 'EN' : '中文';
-    localStorage.setItem('lang', lang);
-    currentLang = lang;
-  }
-
-  function toggleLang() {
-    applyLang(currentLang === 'zh' ? 'en' : 'zh');
-  }
-
-  function copyPromote(btn) {
-    var text = document.getElementById('promote-text');
-    if (!text) return;
-    var t = i18n[currentLang];
-    navigator.clipboard.writeText(text.innerText).then(function () {
-      btn.textContent = t.copy_done;
-      setTimeout(function () { btn.textContent = t.copy_btn; }, 2000);
-    });
-  }
-
-  (function initLang() {
-    var saved = localStorage.getItem('lang');
-    if (saved) { applyLang(saved); return; }
-    var nav = navigator.language || navigator.userLanguage || '';
-    applyLang(nav.startsWith('zh') ? 'zh' : 'en');
-  })();
-  </script>
-  <script>
-  (function () {
-    var container = document.getElementById('cosmos-canvas');
-    if (!container) return;
-
-    var vertSrc = [
-      'attribute vec2 position;',
-      'varying vec2 vUv;',
-      'void main() {',
-      '  vUv = position * 0.5 + 0.5;',
-      '  gl_Position = vec4(position, 0.0, 1.0);',
-      '}'
-    ].join('\n');
-
-    var fragSrc = [
-      'precision highp float;',
-      'uniform float uTime;',
-      'uniform vec3 uResolution;',
-      'uniform vec2 uMouse;',
-      'uniform float uMouseActive;',
-      'varying vec2 vUv;',
-      '',
-      '#define NUM_LAYER 4.0',
-      '#define MAT45 mat2(0.7071, -0.7071, 0.7071, 0.7071)',
-      '',
-      'float Hash21(vec2 p) {',
-      '  p = fract(p * vec2(123.34, 456.21));',
-      '  p += dot(p, p + 45.32);',
-      '  return fract(p.x * p.y);',
-      '}',
-      '',
-      'float tri(float x) {',
-      '  return abs(fract(x) * 2.0 - 1.0);',
-      '}',
-      '',
-      'float tris(float x) {',
-      '  return 1.0 - smoothstep(0.0, 1.0, abs(2.0 * fract(x) - 1.0));',
-      '}',
-      '',
-      'float trisn(float x) {',
-      '  return 2.0 * (1.0 - smoothstep(0.0, 1.0, abs(2.0 * fract(x) - 1.0))) - 1.0;',
-      '}',
-      '',
-      'float Star(vec2 uv, float flare) {',
-      '  float d = length(uv);',
-      '  float m = 0.02 / d;',
-      '  float rays = smoothstep(0.0, 1.0, 1.0 - abs(uv.x * uv.y * 1000.0));',
-      '  m += rays * flare * 0.35;',
-      '  uv *= MAT45;',
-      '  rays = smoothstep(0.0, 1.0, 1.0 - abs(uv.x * uv.y * 1000.0));',
-      '  m += rays * 0.1 * flare;',
-      '  m *= smoothstep(1.0, 0.2, d);',
-      '  return m;',
-      '}',
-      '',
-      'vec3 StarLayer(vec2 uv) {',
-      '  vec3 col = vec3(0.0);',
-      '  vec2 gv = fract(uv) - 0.5;',
-      '  vec2 id = floor(uv);',
-      '  for (int y = -1; y <= 1; y++) {',
-      '    for (int x = -1; x <= 1; x++) {',
-      '      vec2 offset = vec2(float(x), float(y));',
-      '      vec2 si = id + offset;',
-      '      float seed = Hash21(si);',
-      '      float size = fract(seed * 345.32);',
-      '      float glossLocal = tri(uTime * 0.03 / (3.0 * seed + 1.0));',
-      '      float flareSize = smoothstep(0.9, 1.0, size) * glossLocal;',
-      '      float bright = 0.7 + 0.3 * Hash21(si + 1.0);',
-      '      float temp = Hash21(si + 2.0);',
-      '      vec3 base = mix(vec3(0.8, 0.85, 1.0), vec3(1.0, 0.95, 0.85), temp);',
-      '      base *= bright;',
-      '      vec2 pad = vec2(',
-      '        tris(seed * 34.0 + uTime * 0.03),',
-      '        tris(seed * 38.0 + uTime * 0.01)',
-      '      ) - 0.5;',
-      '      float star = Star(gv - offset - pad, flareSize);',
-      '      float twinkle = trisn(uTime * 0.3 + seed * 6.2831) * 0.5 + 1.0;',
-      '      twinkle = mix(1.0, twinkle, 0.4);',
-      '      star *= twinkle;',
-      '      col += star * size * base;',
-      '    }',
-      '  }',
-      '  return col;',
-      '}',
-      '',
-      'void main() {',
-      '  vec2 uv = (vUv * uResolution.xy - 0.5 * uResolution.xy) / uResolution.y;',
-      '  vec2 mouseOffset = (uMouse - vec2(0.5)) * 0.08 * uMouseActive;',
-      '  uv += mouseOffset;',
-      '  float angle = uTime * 0.03;',
-      '  mat2 rot = mat2(cos(angle), -sin(angle), sin(angle), cos(angle));',
-      '  uv = rot * uv;',
-      '  vec3 col = vec3(0.0);',
-      '  for (float i = 0.0; i < 1.0; i += 1.0 / NUM_LAYER) {',
-      '    float depth = fract(i + uTime * 0.03);',
-      '    float scale = mix(20.0, 0.5, depth);',
-      '    float fade = depth * smoothstep(1.0, 0.9, depth);',
-      '    col += StarLayer(uv * scale + i * 453.32) * fade;',
-      '  }',
-      '  gl_FragColor = vec4(col, 1.0);',
-      '}'
-    ].join('\n');
-
-    var canvas = document.createElement('canvas');
-    canvas.style.cssText = 'width:100%;height:100%;display:block';
-    container.appendChild(canvas);
-
-    var gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
-    if (!gl) return;
-
-    function compile(type, src) {
-      var s = gl.createShader(type);
-      gl.shaderSource(s, src);
-      gl.compileShader(s);
-      return s;
-    }
-
-    var prog = gl.createProgram();
-    gl.attachShader(prog, compile(gl.VERTEX_SHADER, vertSrc));
-    gl.attachShader(prog, compile(gl.FRAGMENT_SHADER, fragSrc));
-    gl.linkProgram(prog);
-    gl.useProgram(prog);
-
-    var buf = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, buf);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 3,-1, -1,3]), gl.STATIC_DRAW);
-
-    var pos = gl.getAttribLocation(prog, 'position');
-    gl.enableVertexAttribArray(pos);
-    gl.vertexAttribPointer(pos, 2, gl.FLOAT, false, 0, 0);
-
-    var uTime = gl.getUniformLocation(prog, 'uTime');
-    var uRes = gl.getUniformLocation(prog, 'uResolution');
-    var uMouse = gl.getUniformLocation(prog, 'uMouse');
-    var uMouseActive = gl.getUniformLocation(prog, 'uMouseActive');
-
-    var mouse = { x: 0.5, y: 0.5 }, target = { x: 0.5, y: 0.5 }, active = 0, activeTarget = 0;
-
-    function resize() {
-      var dpr = Math.min(window.devicePixelRatio || 1, 2);
-      var w = container.offsetWidth, h = container.offsetHeight;
-      canvas.width = w * dpr;
-      canvas.height = h * dpr;
-      gl.viewport(0, 0, canvas.width, canvas.height);
-    }
-
-    resize();
-    window.addEventListener('resize', resize);
-
-    document.addEventListener('mousemove', function (e) {
-      var rect = container.getBoundingClientRect();
-      target.x = (e.clientX - rect.left) / rect.width;
-      target.y = 1.0 - (e.clientY - rect.top) / rect.height;
-      activeTarget = 1;
-    });
-
-    document.addEventListener('mouseleave', function () {
-      activeTarget = 0;
-    });
-
-    var raf;
-    function tick(t) {
-      raf = requestAnimationFrame(tick);
-      var s = 0.05;
-      mouse.x += (target.x - mouse.x) * s;
-      mouse.y += (target.y - mouse.y) * s;
-      active += (activeTarget - active) * s;
-
-      gl.uniform1f(uTime, t * 0.001);
-      gl.uniform3f(uRes, canvas.width, canvas.height, canvas.width / canvas.height);
-      gl.uniform2f(uMouse, mouse.x, mouse.y);
-      gl.uniform1f(uMouseActive, active);
-      gl.drawArrays(gl.TRIANGLES, 0, 3);
-    }
-
-    raf = requestAnimationFrame(tick);
-  })();
-  </script>
+  <script src="{{ site.baseurl }}/assets/site.js" defer></script>
 </body>
 </html>

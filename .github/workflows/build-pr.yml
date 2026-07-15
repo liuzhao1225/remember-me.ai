@@ -1,0 +1,40 @@
+name: Build PR
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: build-pr-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+
+      - uses: ruby/setup-ruby@6e5d382445ae5590b7449d8b3bc8cb1c2c27f617 # v1.317.0
+        with:
+          ruby-version: "3.3"
+          bundler-cache: true
+
+      - name: Check plugin syntax
+        run: ruby -c _plugins/contributors_generator.rb
+
+      - name: Run tests
+        run: bundle exec ruby -Itest test/contributors_generator_test.rb
+
+      - name: Build Jekyll
+        run: bundle exec jekyll build --destination ./_site --trace
+        env:
+          JEKYLL_ENV: production
+
+      - name: Check internal links
+        run: bundle exec ruby scripts/check_internal_links.rb --site-dir _site --baseurl /remember-me.ai

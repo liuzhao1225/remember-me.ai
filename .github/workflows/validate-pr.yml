@@ -6,7 +6,7 @@ on:
 
 permissions:
   contents: read
-  pull-requests: write
+  pull-requests: read
 
 jobs:
   check-permission:
@@ -20,43 +20,183 @@ jobs:
           REPO_OWNER: ${{ github.repository_owner }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
           REPO: ${{ github.repository }}
+          HEAD_REPO: ${{ github.event.pull_request.head.repo.full_name }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: |
+          set -euo pipefail
+
           if [ "$PR_AUTHOR" = "$REPO_OWNER" ]; then
-            echo "Repo owner (${PR_AUTHOR}) — skip check"
+            echo "Repository owner PR — contributor-only restrictions do not apply"
             exit 0
           fi
 
-          CHANGED=$(gh pr diff "$PR_NUMBER" -R "$REPO" --name-only)
+          ALLOWED="contributors/${PR_AUTHOR}/"
+          FILES_JSON=$(gh api --paginate --slurp \
+            "repos/${REPO}/pulls/${PR_NUMBER}/files?per_page=100")
+          FILE_COUNT=$(jq '[.[][]] | length' <<< "$FILES_JSON")
 
-          echo "PR author: ${PR_AUTHOR}"
-          echo "Changed files:"
-          echo "${CHANGED}"
-
-          TOUCHED_OTHERS=""
-          while IFS= read -r file; do
-            [ -z "$file" ] && continue
-            if [[ "$file" == contributors/* && "$file" != contributors/${PR_AUTHOR}/* ]]; then
-              TOUCHED_OTHERS="${TOUCHED_OTHERS}\n  - ${file}"
-            fi
-          done <<< "$CHANGED"
-
-          if [ -n "$TOUCHED_OTHERS" ]; then
-            echo "::error::You cannot modify other contributors' directories"
-            echo -e "Unauthorized changes:${TOUCHED_OTHERS}"
-            echo "touched_others=true" >> "$GITHUB_OUTPUT"
+          if [ "$FILE_COUNT" -eq 0 ] || [ "$FILE_COUNT" -ge 3000 ]; then
+            echo "invalid=true" >> "$GITHUB_OUTPUT"
+            echo "::error::Changed file count is empty or at the API limit; failing closed"
             exit 1
           fi
 
-          echo "No unauthorized changes — OK"
+          CURRENT_HEAD=$(gh api "repos/${REPO}/pulls/${PR_NUMBER}" --jq .head.sha)
+          if [ "$CURRENT_HEAD" != "$HEAD_SHA" ]; then
+            echo "invalid=true" >> "$GITHUB_OUTPUT"
+            echo "::error::Pull request head changed while validation was starting; failing closed"
+            exit 1
+          fi
 
-      - name: Close invalid PR
-        if: failure() && steps.validate.outputs.touched_others == 'true'
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}
-          PR_AUTHOR: ${{ github.event.pull_request.user.login }}
-          REPO: ${{ github.repository }}
-        run: |
-          COMMENT="❌ PR 已自动关闭：@${PR_AUTHOR} 你不能修改其他贡献者的目录。请移除对他人目录的修改后重新提交。
-          ❌ PR auto-closed: @${PR_AUTHOR} you cannot modify other contributors' directories. Please remove unauthorized changes and resubmit."
-          gh pr close "$PR_NUMBER" -R "$REPO" -c "$COMMENT"
+          echo "PR author: ${PR_AUTHOR}"
+          echo "Allowed prefix: ${ALLOWED}"
+
+          mapfile -d '' -t CHANGED_FILES < <(
+            jq -j '.[][] | .filename, "\u0000"' <<< "$FILES_JSON"
+          )
+          mapfile -d '' -t PREVIOUS_FILES < <(
+            jq -j '.[][] | select(.previous_filename != null) | .previous_filename, "\u0000"' \
+              <<< "$FILES_JSON"
+          )
+
+          INVALID_PATHS=()
+          for file in "${CHANGED_FILES[@]}" "${PREVIOUS_FILES[@]}"; do
+            printf 'Changed: %q\n' "$file"
+            relative=${file#"$ALLOWED"}
+            if [[ "$file" != "$ALLOWED"* ]] || [ -z "$relative" ] \
+              || [[ "$file" == *$'\n'* || "$file" == *$'\r'* || "$file" == *$'\t'* ]] \
+              || [[ "/$relative/" == *"/../"* || "/$relative/" == *"/./"* ]]; then
+              INVALID_PATHS+=("$file")
+            fi
+          done
+
+          if [ "${#INVALID_PATHS[@]}" -gt 0 ]; then
+            echo "invalid=true" >> "$GITHUB_OUTPUT"
+            echo "::error::Every changed file must be under ${ALLOWED}"
+            printf 'Unauthorized: %q\n' "${INVALID_PATHS[@]}"
+            exit 1
+          fi
+
+          COMMIT_JSON=$(gh api "repos/${HEAD_REPO}/git/commits/${HEAD_SHA}")
+          if [ "$(jq -r '.sha' <<< "$COMMIT_JSON")" != "$HEAD_SHA" ]; then
+            echo "invalid=true" >> "$GITHUB_OUTPUT"
+            echo "::error::Head commit does not match the pull request event; failing closed"
+            exit 1
+          fi
+          TREE_SHA=$(jq -r '.tree.sha' <<< "$COMMIT_JSON")
+          TREE_JSON=$(gh api "repos/${HEAD_REPO}/git/trees/${TREE_SHA}?recursive=1")
+          if [ "$(jq -r '.truncated' <<< "$TREE_JSON")" = "true" ]; then
+            echo "invalid=true" >> "$GITHUB_OUTPUT"
+            echo "::error::The pull request tree is truncated; failing closed"
+            exit 1
+          fi
+
+          mapfile -t UNSAFE_ENTRIES < <(
+            jq -r --arg prefix "$ALLOWED" \
+              '.tree[] | select((.mode == "120000" or .mode == "160000") and (.path | startswith($prefix))) | .path' \
+              <<< "$TREE_JSON"
+          )
+          if [ "${#UNSAFE_ENTRIES[@]}" -gt 0 ]; then
+            echo "invalid=true" >> "$GITHUB_OUTPUT"
+            echo "::error::Symbolic links and gitlinks are not allowed under contributors/"
+            printf 'Unsafe entry: %q\n' "${UNSAFE_ENTRIES[@]}"
+            exit 1
+          fi
+
+          mapfile -t OVERSIZED_FILES < <(
+            jq -r --arg prefix "$ALLOWED" \
+              '.tree[] | select(.type == "blob" and .size > 52428800 and (.path | startswith($prefix))) | .path' \
+              <<< "$TREE_JSON"
+          )
+          if [ "${#OVERSIZED_FILES[@]}" -gt 0 ]; then
+            echo "invalid=true" >> "$GITHUB_OUTPUT"
+            echo "::error::Contributor files must not exceed 50 MB"
+            printf 'Oversized: %q\n' "${OVERSIZED_FILES[@]}"
+            exit 1
+          fi
+
+          for file in "${CHANGED_FILES[@]}"; do
+            relative=${file#"$ALLOWED"}
+            blob_sha=$(jq -r --arg path "$file" \
+              '.tree[] | select(.path == $path and .type == "blob") | .sha' \
+              <<< "$TREE_JSON")
+
+            case "$relative" in
+              README.md|about.md)
+                [ -z "$blob_sha" ] && continue
+                gh api "repos/${HEAD_REPO}/git/blobs/${blob_sha}" --jq .content \
+                  | tr -d '\n' \
+                  | base64 --decode \
+                  | ruby -e '
+                      text = STDIN.binmode.read.force_encoding(Encoding::UTF_8)
+                      abort "text file is not valid UTF-8" unless text.valid_encoding?
+                      raw_html = /<!--|<![A-Za-z]|<\s*\/?\s*[A-Za-z][A-Za-z0-9-]*(?:\s[^>]*)?\/?\s*>/m
+                      unsafe_url = /\b(?:javascript|vbscript)\s*:|\bdata\s*:\s*text\/html/i
+                      abort "raw HTML is not allowed in contributor Markdown" if text.match?(raw_html)
+                      abort "unsafe URL scheme in contributor Markdown" if text.match?(unsafe_url)
+                    '
+                ;;
+              posts/*.md|pages/*.md)
+                if ! [[ "$relative" =~ ^(posts|pages)/[A-Za-z0-9._-]+\.md$ ]]; then
+                  echo "invalid=true" >> "$GITHUB_OUTPUT"
+                  echo "::error::Markdown filenames must use ASCII letters, numbers, dots, underscores, or hyphens: ${file}"
+                  exit 1
+                fi
+                [ -z "$blob_sha" ] && continue
+                gh api "repos/${HEAD_REPO}/git/blobs/${blob_sha}" --jq .content \
+                  | tr -d '\n' \
+                  | base64 --decode \
+                  | ruby -e '
+                      text = STDIN.binmode.read.force_encoding(Encoding::UTF_8)
+                      abort "text file is not valid UTF-8" unless text.valid_encoding?
+                      raw_html = /<!--|<![A-Za-z]|<\s*\/?\s*[A-Za-z][A-Za-z0-9-]*(?:\s[^>]*)?\/?\s*>/m
+                      unsafe_url = /\b(?:javascript|vbscript)\s*:|\bdata\s*:\s*text\/html/i
+                      abort "raw HTML is not allowed in contributor Markdown" if text.match?(raw_html)
+                      abort "unsafe URL scheme in contributor Markdown" if text.match?(unsafe_url)
+                    '
+                ;;
+              posts/.gitkeep|pages/.gitkeep|assets/.gitkeep)
+                ;;
+              assets/*.png|assets/*.jpg|assets/*.jpeg|assets/*.gif|assets/*.webp|assets/*.avif)
+                if ! [[ "$relative" =~ ^assets/[A-Za-z0-9._-]+\.(png|jpg|jpeg|gif|webp|avif)$ ]]; then
+                  echo "invalid=true" >> "$GITHUB_OUTPUT"
+                  echo "::error::Asset filenames must use ASCII letters, numbers, dots, underscores, or hyphens: ${file}"
+                  exit 1
+                fi
+                [ -z "$blob_sha" ] && continue
+                extension=${relative##*.}
+                case "$extension" in
+                  png) expected_mime="image/png" ;;
+                  jpg|jpeg) expected_mime="image/jpeg" ;;
+                  gif) expected_mime="image/gif" ;;
+                  webp) expected_mime="image/webp" ;;
+                  avif) expected_mime="image/avif" ;;
+                esac
+                actual_mime=$(
+                  gh api "repos/${HEAD_REPO}/git/blobs/${blob_sha}" --jq .content \
+                    | tr -d '\n' \
+                    | base64 --decode \
+                    | file --brief --mime-type -
+                )
+                if [ "$actual_mime" != "$expected_mime" ]; then
+                  echo "invalid=true" >> "$GITHUB_OUTPUT"
+                  echo "::error::Asset content does not match its extension: ${file} (${actual_mime})"
+                  exit 1
+                fi
+                ;;
+              *)
+                echo "invalid=true" >> "$GITHUB_OUTPUT"
+                echo "::error::Unsupported contributor file: ${file}"
+                exit 1
+                ;;
+            esac
+          done
+
+          CURRENT_HEAD=$(gh api "repos/${REPO}/pulls/${PR_NUMBER}" --jq .head.sha)
+          if [ "$CURRENT_HEAD" != "$HEAD_SHA" ]; then
+            echo "invalid=true" >> "$GITHUB_OUTPUT"
+            echo "::error::Pull request head changed during validation; failing closed"
+            exit 1
+          fi
+
+          echo "Contributor path, file type, UTF-8, HTML and symlink checks passed"
