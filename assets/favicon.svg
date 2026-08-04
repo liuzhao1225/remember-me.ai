@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title">
+  <title id="title">remember-me.ai</title>
+  <rect width="64" height="64" rx="14" fill="#000"/>
+  <path d="M32 32C24 20 20 16 14 16 6 16 2 23 2 32s4 16 12 16c6 0 10-4 18-16 8-12 12-16 18-16 8 0 12 7 12 16s-4 16-12 16c-6 0-10-4-18-16Z" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

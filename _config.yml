@@ -1,7 +1,8 @@
 title: remember-me.ai
-description: "真正的死亡不是肉身的终结，而是被彻底遗忘。"
+description: "remember-me.ai 是一个面向 AI 时代的数字永生开源计划，邀请每个人主动留下故事、信念与作品，建立公开、可检索、可持续的个人数字记忆。"
 baseurl: /remember-me.ai
 url: https://liuzhao1225.github.io
+locale: zh_CN
 markdown: kramdown
 kramdown:
   input: GFM
@@ -13,3 +14,12 @@ exclude:
   - node_modules
   - .cursor
   - .venv
+  - AGENTS.md
+  - CONTRIBUTING.md
+  - LICENSE
+  - README.md
+  - README_EN.md
+  - scripts
+  - templates
+  - test
+  - "**/*.mmd"

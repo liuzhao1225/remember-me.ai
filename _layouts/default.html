@@ -1,11 +1,44 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
+  {% assign seo_title = page.seo_title | default: page.title | default: site.title %}
+  {% if page.seo_title %}
+    {% assign document_title = page.seo_title %}
+  {% elsif seo_title == site.title %}
+    {% assign document_title = site.title %}
+  {% else %}
+    {% capture document_title %}{{ seo_title }} | {{ site.title }}{% endcapture %}
+  {% endif %}
+  {% assign seo_description = page.description | default: site.description | strip_newlines | strip %}
+  {% assign canonical_path = page.url | default: '/' | replace: 'index.html', '' %}
+  {% assign canonical_url = canonical_path | absolute_url | uri_escape %}
+  {% assign og_type = page.og_type | default: 'website' %}
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' https: data:; media-src 'self' https:; font-src 'self' data:; connect-src https://api.github.com; object-src 'none'; base-uri 'none'; form-action 'none'">
-  <title>{{ page.title | default: site.title | escape }}</title>
-  <meta name="description" content="{{ page.description | default: site.description | escape }}">
+  <title>{{ document_title | strip | escape }}</title>
+  <meta name="description" content="{{ seo_description | escape }}">
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+  <link rel="canonical" href="{{ canonical_url }}">
+  <link rel="sitemap" type="application/xml" href="{{ '/sitemap.xml' | absolute_url }}">
+  <link rel="icon" type="image/svg+xml" href="{{ '/assets/favicon.svg' | relative_url }}">
+  <meta name="theme-color" content="#000000">
+
+  <meta property="og:locale" content="{{ site.locale | default: 'zh_CN' }}">
+  <meta property="og:site_name" content="{{ site.title | escape }}">
+  <meta property="og:type" content="{{ og_type | escape }}">
+  <meta property="og:title" content="{{ document_title | strip | escape }}">
+  <meta property="og:description" content="{{ seo_description | escape }}">
+  <meta property="og:url" content="{{ canonical_url }}">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="{{ document_title | strip | escape }}">
+  <meta name="twitter:description" content="{{ seo_description | escape }}">
+  {% if og_type == 'article' and page.date %}
+  <meta property="article:published_time" content="{{ page.date | date_to_xmlschema }}">
+  {% endif %}
+  {% if og_type == 'article' and page.author_url %}
+  <meta property="article:author" content="{{ page.author_url | escape }}">
+  {% endif %}
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 

@@ -1,0 +1,25 @@
+---
+layout: null
+permalink: /sitemap.xml
+sitemap: false
+---
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+{% assign sitemap_pages = site.pages | sort: 'url' -%}
+{% for sitemap_page in sitemap_pages -%}
+  {% unless sitemap_page.sitemap == false -%}
+  <url>
+    <loc>{{ sitemap_page.url | absolute_url | uri_escape | xml_escape }}</loc>
+  </url>
+  {% endunless -%}
+{% endfor -%}
+{% for contributor in site.data.contributors -%}
+  {% for contributor_page in contributor.pages -%}
+    {% if contributor_page.static -%}
+  <url>
+    <loc>{{ '/contributors/' | append: contributor.username | append: '/' | append: contributor_page.path | absolute_url | uri_escape | xml_escape }}</loc>
+  </url>
+    {% endif -%}
+  {% endfor -%}
+{% endfor -%}
+</urlset>

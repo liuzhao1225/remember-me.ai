@@ -1,4 +1,5 @@
 require "find"
+require "date"
 
 module RememberMe
   def self.reject_contributor_symlinks!(source)
@@ -65,6 +66,18 @@ module RememberMe
         pages = collect_pages(user_dir)
         about = collect_about(user_dir)
         last_updated = posts.map { |p| p["date"] }.reject(&:empty?).max || ""
+        contributor_description =
+          if quote.empty?
+            extract_description(
+              readme,
+              fallback: "#{title} 在 remember-me.ai 留下的故事、信念与作品。"
+            )
+          else
+            truncate_description(
+              "#{title}：#{clean_inline_markdown(quote)}",
+              160
+            )
+          end
 
         site.data["contributors"] << {
           "username" => username,
@@ -88,6 +101,8 @@ module RememberMe
             "layout" => "contributor",
             "title" => title,
             "username" => username,
+            "description" => contributor_description,
+            "og_type" => "profile",
             "posts" => posts,
             "pages" => pages,
             "about" => !about.nil?,
@@ -100,7 +115,13 @@ module RememberMe
             "contributors/#{username}/about",
             "index.md",
             about["content"],
-            { "layout" => "post", "title" => about["title"], "username" => username }
+            {
+              "layout" => "post",
+              "title" => about["title"],
+              "username" => username,
+              "description" => about["description"],
+              "og_type" => "profile",
+            }
           )
         end
 
@@ -110,7 +131,16 @@ module RememberMe
             "contributors/#{username}/#{post['slug']}",
             "index.md",
             post["content"],
-            { "layout" => "post", "title" => post["title"], "username" => username }
+            {
+              "layout" => "post",
+              "title" => post["title"],
+              "username" => username,
+              "description" => post["description"],
+              "og_type" => "article",
+              "date" => post["date"].empty? ? nil : post["date"],
+              "author_name" => title,
+              "author_url" => "https://github.com/#{username}",
+            }
           )
         end
 
@@ -120,7 +150,15 @@ module RememberMe
             "contributors/#{username}/pages/#{page['slug']}",
             "index.md",
             page["content"],
-            { "layout" => page["layout"], "title" => page["title"], "username" => username }
+            {
+              "layout" => page["layout"],
+              "title" => page["title"],
+              "username" => username,
+              "description" => page["description"],
+              "og_type" => "article",
+              "author_name" => title,
+              "author_url" => "https://github.com/#{username}",
+            }
           )
         end
       end
@@ -151,7 +189,15 @@ module RememberMe
 
       content = read_utf8(path)
       title = content[/^#\s+(.+)/, 1]&.strip || "About"
-      { "title" => title, "content" => content }
+      body_description = extract_description(
+        content,
+        fallback: "在 remember-me.ai 的个人介绍。"
+      )
+      {
+        "title" => title,
+        "content" => content,
+        "description" => truncate_description("#{title}：#{body_description}", 160),
+      }
     end
 
     def collect_posts(user_dir)
@@ -165,8 +211,17 @@ module RememberMe
           content = read_utf8(File.join(posts_dir, file))
           title = content[/^#\s+(.+)/, 1]&.strip || file.sub(/\.md$/, "")
           slug = file.sub(/\.md$/, "")
-          date = slug[/^(\d{4}-\d{2}-\d{2})/, 1] || ""
-          { "title" => title, "slug" => slug, "date" => date, "content" => content }
+          date = extract_post_date(slug)
+          {
+            "title" => title,
+            "slug" => slug,
+            "date" => date,
+            "content" => content,
+            "description" => extract_description(
+              content,
+              fallback: "#{title}，发布于 remember-me.ai。"
+            ),
+          }
         end
     end
 
@@ -184,7 +239,12 @@ module RememberMe
 
           if file.end_with?(".html")
             title = content[/<title>(.+?)<\/title>/im, 1]&.strip || slug
-            { "title" => title, "slug" => slug, "path" => "pages/#{file}" }
+            {
+              "title" => title,
+              "slug" => slug,
+              "path" => "pages/#{file}",
+              "static" => true,
+            }
           else
             title = content[/^#\s+(.+)/, 1]&.strip || slug
             {
@@ -193,9 +253,77 @@ module RememberMe
               "path" => "pages/#{slug}/",
               "content" => content,
               "layout" => "post",
+              "description" => extract_description(
+                content,
+                fallback: "#{title}，发布于 remember-me.ai。"
+              ),
             }
           end
         end
+    end
+
+    def extract_description(content, fallback:, limit: 160, minimum: 40)
+      in_code_block = false
+      paragraph = []
+      descriptions = []
+
+      content.each_line do |line|
+        stripped = line.strip
+        if stripped.start_with?("```", "~~~")
+          in_code_block = !in_code_block
+          next
+        end
+        next if in_code_block
+
+        if stripped.empty?
+          description = clean_inline_markdown(paragraph.join(" "))
+          descriptions << description unless description.empty?
+          combined = descriptions.join(" ")
+          return truncate_description(combined, limit) if combined.length >= minimum
+
+          paragraph = []
+          next
+        end
+
+        next if stripped.match?(/\A\#{1,6}\s+/)
+        next if stripped.match?(/\A(?:---+|___+|\*\*\*+)\z/)
+        next if stripped.start_with?(">")
+        next if stripped.match?(/\A\*\d{4}-\d{2}-\d{2}\*\z/)
+        next if stripped.match?(/\A\*\*[^*]+\*\*\z/)
+
+        paragraph << stripped
+      end
+
+      description = clean_inline_markdown(paragraph.join(" "))
+      descriptions << description unless description.empty?
+      combined = descriptions.join(" ")
+      combined = clean_inline_markdown(fallback) if combined.empty?
+      truncate_description(combined, limit)
+    end
+
+    def clean_inline_markdown(text)
+      text
+        .gsub(/!\[[^\]]*\]\([^)]*\)/, "")
+        .gsub(/\[([^\]]+)\]\([^)]*\)/, '\\1')
+        .gsub(/[`*_~]/, "")
+        .gsub(/\s+/, " ")
+        .strip
+    end
+
+    def truncate_description(text, limit)
+      return text if text.length <= limit
+
+      "#{text[0, limit - 1].rstrip}…"
+    end
+
+    def extract_post_date(slug)
+      candidate = slug[/^(\d{4}-\d{2}-\d{2})/, 1]
+      return "" unless candidate
+
+      Date.iso8601(candidate)
+      candidate
+    rescue Date::Error
+      ""
     end
   end
 end

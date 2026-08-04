@@ -65,7 +65,71 @@ class ContributorsGeneratorTest < Minitest::Test
 
       assert_equal "About Alice", about["title"]
       assert_includes about["content"], "Hello."
+      assert_equal "About Alice：Hello.", about["description"]
     end
+  end
+
+  def test_extracts_a_clean_description_from_the_first_body_paragraph
+    content = <<~MARKDOWN
+      **Alice**
+      *2026-01-02*
+
+      # A title
+
+      > A warning that should not become the search snippet.
+
+      This is the **first** paragraph with [a link](https://example.com).
+
+      This is the second paragraph.
+    MARKDOWN
+
+    description = @generator.send(
+      :extract_description,
+      content,
+      fallback: "Fallback"
+    )
+
+    assert_equal "This is the first paragraph with a link.", description
+  end
+
+  def test_truncates_descriptions_to_the_requested_limit
+    description = @generator.send(
+      :extract_description,
+      "# Title\n\n#{'a' * 50}\n",
+      fallback: "Fallback",
+      limit: 20
+    )
+
+    assert_equal "#{'a' * 19}…", description
+    assert_equal 20, description.length
+  end
+
+  def test_combines_short_opening_paragraphs_for_a_useful_description
+    content = <<~MARKDOWN
+      # A title
+
+      Too short.
+
+      This second paragraph supplies enough context for a useful search result.
+    MARKDOWN
+
+    description = @generator.send(
+      :extract_description,
+      content,
+      fallback: "Fallback"
+    )
+
+    assert_equal(
+      "Too short. This second paragraph supplies enough context for a useful search result.",
+      description
+    )
+  end
+
+  def test_accepts_only_real_iso_dates_from_post_slugs
+    assert_equal "2026-02-28", @generator.send(:extract_post_date, "2026-02-28-example")
+    assert_equal "", @generator.send(:extract_post_date, "2026-02-30-example")
+    assert_equal "", @generator.send(:extract_post_date, "2026-99-01-example")
+    assert_equal "", @generator.send(:extract_post_date, "example-without-date")
   end
 end
 

@@ -38,3 +38,6 @@ jobs:
 
       - name: Check internal links
         run: bundle exec ruby scripts/check_internal_links.rb --site-dir _site --baseurl /remember-me.ai
+
+      - name: Check SEO output
+        run: bundle exec ruby scripts/check_seo.rb --site-dir _site
