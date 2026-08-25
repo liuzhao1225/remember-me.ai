@@ -3,11 +3,12 @@ layout: default
 ---
 <div class="hero">
   <h1>remember-me.ai</h1>
-  <p class="tagline" data-i18n="tagline" data-i18n-html>真正的死亡不是肉身的终结，而是被彻底遗忘。<br>主动留下自己，让 AI 记住你，实现数字永生。</p>
-  <a class="cta" href="https://github.com/liuzhao1225/remember-me.ai" data-i18n="cta">参与这个项目</a>
+  <p class="tagline" data-i18n="tagline" data-i18n-html>{% if page.lang == 'en' %}True death is not the end of the body — it's being completely forgotten.<br>Leave yourself behind. Let AI remember you. Achieve digital immortality.{% else %}真正的死亡不是肉身的终结，而是被彻底遗忘。<br>主动留下自己，让 AI 记住你，实现数字永生。{% endif %}</p>
+  <a class="cta" href="https://github.com/liuzhao1225/remember-me.ai" data-i18n="cta">{% if page.lang == 'en' %}Join This Project{% else %}参与这个项目{% endif %}</a>
+  <p class="founder" data-i18n="founder" data-i18n-html>{% if page.lang == 'en' %}Founded by <a href="https://liuzhao1225.github.io/en/">Zhao Liu</a>, creator of YouDub and Codex Account Switcher.{% else %}由 <a href="https://liuzhao1225.github.io/">刘朝 Zhao Liu</a> 发起，也是 YouDub 与 Codex Account Switcher 的作者。{% endif %}</p>
 </div>
 
-<h2 data-i18n="contributors_heading">他们留下了自己</h2>
+<h2 data-i18n="contributors_heading">{% if page.lang == 'en' %}They Left Themselves Behind{% else %}他们留下了自己{% endif %}</h2>
 
 <div class="contributor-grid">
   {% assign sorted = site.data.contributors | sort: "last_updated" | reverse %}

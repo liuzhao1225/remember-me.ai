@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+{% assign page_language = page.lang | default: 'zh-CN' %}
+<html lang="{{ page_language }}">
 <head>
   {% assign seo_title = page.seo_title | default: page.title | default: site.title %}
   {% if page.seo_title %}
@@ -20,11 +21,24 @@
   <meta name="description" content="{{ seo_description | escape }}">
   <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
   <link rel="canonical" href="{{ canonical_url }}">
+  {% if page.url == '/' %}
+  <link rel="alternate" hreflang="zh-CN" href="{{ '/' | absolute_url }}">
+  <link rel="alternate" hreflang="en" href="{{ '/en/' | absolute_url }}">
+  <link rel="alternate" hreflang="x-default" href="{{ '/en/' | absolute_url }}">
+  {% elsif page.url == '/en/' %}
+  <link rel="alternate" hreflang="zh-CN" href="{{ '/' | absolute_url }}">
+  <link rel="alternate" hreflang="en" href="{{ '/en/' | absolute_url }}">
+  <link rel="alternate" hreflang="x-default" href="{{ '/en/' | absolute_url }}">
+  {% endif %}
   <link rel="sitemap" type="application/xml" href="{{ '/sitemap.xml' | absolute_url }}">
+  <link rel="me" href="{{ site.author.url }}">
+  {% for identity_url in site.author.same_as %}<link rel="me" href="{{ identity_url }}">
+  {% endfor %}
   <link rel="icon" type="image/svg+xml" href="{{ '/assets/favicon.svg' | relative_url }}">
   <meta name="theme-color" content="#000000">
 
-  <meta property="og:locale" content="{{ site.locale | default: 'zh_CN' }}">
+  <meta property="og:locale" content="{% if page_language == 'en' %}en_US{% else %}{{ site.locale | default: 'zh_CN' }}{% endif %}">
+  <meta property="og:locale:alternate" content="{% if page_language == 'en' %}zh_CN{% else %}en_US{% endif %}">
   <meta property="og:site_name" content="{{ site.title | escape }}">
   <meta property="og:type" content="{{ og_type | escape }}">
   <meta property="og:title" content="{{ document_title | strip | escape }}">
@@ -48,6 +62,7 @@
         "@id": {{ site.url | append: site.baseurl | append: '/#website' | jsonify }},
         "url": {{ site.url | append: site.baseurl | append: '/' | jsonify }},
         "name": {{ site.title | jsonify }},
+        "alternateName": {{ site.alternate_titles | jsonify }},
         "description": {{ site.description | jsonify }},
         "inLanguage": ["zh-CN", "en"],
         "creator": { "@id": {{ site.author.url | append: '#zhao-liu' | jsonify }} }
@@ -58,6 +73,8 @@
         "name": {{ site.author.name | jsonify }},
         "alternateName": {{ site.author.alternate_names | jsonify }},
         "url": {{ site.author.url | jsonify }},
+        "jobTitle": "AI Product Builder and Open-Source Developer",
+        "knowsLanguage": ["zh-CN", "en"],
         "sameAs": {{ site.author.same_as | jsonify }},
         "knowsAbout": [
           "Artificial intelligence",
@@ -79,7 +96,7 @@
     "description": {{ seo_description | jsonify }},
     "url": {{ canonical_url | jsonify }},
     "mainEntityOfPage": {{ canonical_url | jsonify }},
-    "inLanguage": "zh-CN",
+    "inLanguage": {{ page_language | jsonify }},
     "author": {
       "@type": "Person",
       "name": {{ page.author_name | jsonify }},
@@ -369,6 +386,17 @@
       font-size: 1.05rem;
       margin-bottom: 0.8rem;
       line-height: 1.8;
+    }
+    .hero .founder {
+      margin: 1rem auto 0;
+      color: var(--text-secondary);
+      font-size: 0.92rem;
+    }
+    .hero .founder a {
+      color: var(--text-primary);
+      text-decoration: underline;
+      text-decoration-color: var(--border-hover);
+      text-underline-offset: 0.2em;
     }
     .hero .cta {
       display: inline-block;

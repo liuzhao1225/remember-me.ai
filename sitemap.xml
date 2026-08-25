@@ -4,12 +4,18 @@ permalink: /sitemap.xml
 sitemap: false
 ---
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
 {% assign sitemap_pages = site.pages | sort: 'url' -%}
 {% for sitemap_page in sitemap_pages -%}
   {% unless sitemap_page.sitemap == false -%}
   <url>
     <loc>{{ sitemap_page.url | absolute_url | uri_escape | xml_escape }}</loc>
+    {% if sitemap_page.url == '/' or sitemap_page.url == '/en/' %}
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="{{ '/' | absolute_url }}" />
+    <xhtml:link rel="alternate" hreflang="en" href="{{ '/en/' | absolute_url }}" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="{{ '/en/' | absolute_url }}" />
+    {% endif %}
   </url>
   {% endunless -%}
 {% endfor -%}

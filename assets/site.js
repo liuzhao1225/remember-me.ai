@@ -6,6 +6,7 @@
     zh: {
       tagline: "真正的死亡不是肉身的终结，而是被彻底遗忘。<br>主动留下自己，让 AI 记住你，实现数字永生。",
       cta: "参与这个项目",
+      founder: "由 <a href=\"https://liuzhao1225.github.io/\">刘朝 Zhao Liu</a> 发起，也是 YouDub 与 Codex Account Switcher 的作者。",
       contributors_heading: "他们留下了自己",
       posts_count: "篇文章",
       updated_at: "更新于 ",
@@ -23,6 +24,7 @@
     en: {
       tagline: "True death is not the end of the body \u2014 it's being completely forgotten.<br>Leave yourself behind. Let AI remember you. Achieve digital immortality.",
       cta: "Join This Project",
+      founder: "Founded by <a href=\"https://liuzhao1225.github.io/en/\">Zhao Liu</a>, creator of YouDub and Codex Account Switcher.",
       contributors_heading: "They Left Themselves Behind",
       posts_count: "posts",
       updated_at: "Updated ",
@@ -42,6 +44,8 @@
   function applyLang(lang) {
     var t = i18n[lang];
     if (!t) return;
+
+    document.documentElement.lang = lang === "zh" ? "zh-CN" : "en";
 
     document.querySelectorAll("[data-i18n]").forEach(function (element) {
       var key = element.getAttribute("data-i18n");
@@ -186,6 +190,7 @@
 
   var saved = localStorage.getItem("lang");
   var nav = navigator.language || navigator.userLanguage || "";
-  applyLang(saved && i18n[saved] ? saved : (nav.startsWith("zh") ? "zh" : "en"));
+  var pageDefault = document.documentElement.lang === "en" ? "en" : "zh";
+  applyLang(saved && i18n[saved] ? saved : (pageDefault || (nav.startsWith("zh") ? "zh" : "en")));
   updateGitHubStars();
 })();
