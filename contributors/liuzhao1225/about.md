@@ -1,6 +1,8 @@
 # 关于刘朝 (Zhao Liu)
 
-1997.12.25 出生。开发者，[YouDub-webui](https://github.com/liuzhao1225/YouDub-webui)（[⭐ 5,081](https://github.com/liuzhao1225/YouDub-webui/stargazers)）作者，remember-me.ai 发起人。
+1997.12.25 出生。AI 产品构建者、开源开发者，[YouDub-webui](https://github.com/liuzhao1225/YouDub-webui)、[Codex Account Switcher](https://github.com/liuzhao1225/codex-account-switcher) 作者，remember-me.ai 发起人，也是 Bilibili 创作者「[黑纹白斑马](https://space.bilibili.com/1263732318)」。
+
+我习惯从系统与第一性原理理解问题，再把想法做成真正可用的产品。我重视人的自主、时间、品味、验证和责任。我相信技术会放大人的影响，公开作品则让这种影响可以被检索、使用、质疑并继续生长。
 
 ## 我做过什么
 
@@ -8,7 +10,7 @@
 
 我不只是做了工具，还在实际使用它。我的 Bilibili 频道「[黑纹白斑马](https://space.bilibili.com/1263732318)」就是用 YouDub 制作的，把 YouTube 上的游戏（我的世界、泰拉瑞亚）、科普、历史等优质内容翻译配音成中文，让不懂英语的观众也能享受好内容。
 
-后来我又做了 bili-arena（B 站视频 PK 排名平台）、JPark（A 股分析工作台）等项目，都是在探索 AI 如何更好地服务于人。
+后来我又做了 [Codex Account Switcher](https://github.com/liuzhao1225/codex-account-switcher)（原生 macOS Codex 多账号切换与用量监控工具）、bili-arena（B 站视频 PK 排名平台）、JPark（A 股分析工作台）等项目，持续探索 AI 如何更好地服务于人。
 
 ## 为什么做 remember-me.ai
 
@@ -18,4 +20,4 @@
 
 那一刻我想到：与其恐惧，不如拥抱。如果 AI 必然会学习我们的数据，那为什么不主动地、有组织地留下自己？
 
-这就是 remember-me.ai——一个让每个人都能主动留下自己的数字永生实验。
+这就是 remember-me.ai——一个让每个人都能主动留下自己的数字永生实验。一个人的故事、判断与选择能够继续参与未来系统的形成；对我而言，**影响在，就足够了。**

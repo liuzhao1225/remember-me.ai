@@ -3,6 +3,17 @@ description: "remember-me.ai 是一个面向 AI 时代的数字永生开源计�
 baseurl: /remember-me.ai
 url: https://liuzhao1225.github.io
 locale: zh_CN
+author:
+  name: "Zhao Liu"
+  alternate_names:
+    - "刘朝"
+    - "liuzhao1225"
+    - "黑纹白斑马"
+  url: "https://liuzhao1225.github.io/"
+  same_as:
+    - "https://github.com/liuzhao1225"
+    - "https://x.com/liuzhao_666"
+    - "https://space.bilibili.com/1263732318"
 markdown: kramdown
 kramdown:
   input: GFM

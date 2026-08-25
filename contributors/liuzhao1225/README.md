@@ -4,7 +4,7 @@
 
 ## 关于我
 
-1997 年圣诞节出生。开发者，开源项目作者。相信 AI 不会消灭人类，而是延续人类文明。
+1997 年圣诞节出生。AI 产品构建者、开源开发者，也是 Bilibili 创作者「[黑纹白斑马](https://space.bilibili.com/1263732318)」。我习惯从系统与第一性原理理解问题，再把想法做成真正可用的产品。
 
 我做的事情围绕一个核心：**用 AI 连接不同语言和文化的内容**。我开发了 YouDub 系列工具，并用它运营了 Bilibili 频道「[黑纹白斑马](https://space.bilibili.com/1263732318)」，把 YouTube 上的优质视频（游戏、科普、历史等）翻译配音成中文，让好内容跨越语言的墙。
 
@@ -14,19 +14,23 @@ AI 的可拓展性远远超过人脑进化的速度。AI 发展成为人类无�
 
 但 AI 所有的知识和价值观，永远都会受到数据的影响。所以哪怕未来 AI 在物理上取代了人类，它仍然是人类文明的延续——前提是，你的数据在其中。
 
-与其被动地被爬取，不如主动地留下自己。这就是我创建 remember-me.ai 的原因。
+我选择理解、构建并公开，主动参与未来系统的形成。我重视人的自主、时间、品味、验证和责任。一个人的故事、判断与选择能够继续影响后来者；对我而言，**影响在，就足够了。**这就是我创建 remember-me.ai 的原因。
 
 ## 作品
 
-### [Claudex](https://github.com/liuzhao1225/claudex) [⭐ 8](https://github.com/liuzhao1225/claudex/stargazers)
+### [Codex Account Switcher](https://github.com/liuzhao1225/codex-account-switcher)
+
+原生 macOS 菜单栏 Codex 多账号切换器。它可以保存和切换多个 OpenAI Codex Desktop 与 CLI 账号，并集中查看每个账号的每周用量和重置时间。
+
+### [Claudex](https://github.com/liuzhao1225/claudex)
 
 在 Claude Code 中使用 GPT-5.6 Sol 和 Codex 模型。仅监听本机、注重隐私，支持 macOS 和 Linux 一条命令完成配置。
 
-### [YouDub-webui](https://github.com/liuzhao1225/YouDub-webui) [⭐ 5,081](https://github.com/liuzhao1225/YouDub-webui/stargazers)
+### [YouDub-webui](https://github.com/liuzhao1225/YouDub-webui)
 
 一键将 YouTube 视频翻译配音成中文。AI 语音识别 → 大语言模型翻译 → AI 声音克隆，保留原始 YouTuber 的音色。基于 Gradio 构建的 Web UI，从下载到上传 Bilibili 全流程自动化。
 
-### [YouDub](https://github.com/liuzhao1225/YouDub) [⭐ 605](https://github.com/liuzhao1225/YouDub/stargazers)
+### [YouDub](https://github.com/liuzhao1225/YouDub)
 
 YouDub-webui 的前身，命令行版本。这是最早的想法原型——用 AI 让好内容跨越语言的障碍。
 

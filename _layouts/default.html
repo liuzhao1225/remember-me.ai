@@ -39,6 +39,56 @@
   {% if og_type == 'article' and page.author_url %}
   <meta property="article:author" content="{{ page.author_url | escape }}">
   {% endif %}
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "@id": {{ site.url | append: site.baseurl | append: '/#website' | jsonify }},
+        "url": {{ site.url | append: site.baseurl | append: '/' | jsonify }},
+        "name": {{ site.title | jsonify }},
+        "description": {{ site.description | jsonify }},
+        "inLanguage": ["zh-CN", "en"],
+        "creator": { "@id": {{ site.author.url | append: '#zhao-liu' | jsonify }} }
+      },
+      {
+        "@type": "Person",
+        "@id": {{ site.author.url | append: '#zhao-liu' | jsonify }},
+        "name": {{ site.author.name | jsonify }},
+        "alternateName": {{ site.author.alternate_names | jsonify }},
+        "url": {{ site.author.url | jsonify }},
+        "sameAs": {{ site.author.same_as | jsonify }},
+        "knowsAbout": [
+          "Artificial intelligence",
+          "Open-source software",
+          "AI video translation and dubbing",
+          "Digital legacy",
+          "Human agency"
+        ]
+      }
+    ]
+  }
+  </script>
+  {% if og_type == 'article' and page.author_name %}
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": {{ seo_title | jsonify }},
+    "description": {{ seo_description | jsonify }},
+    "url": {{ canonical_url | jsonify }},
+    "mainEntityOfPage": {{ canonical_url | jsonify }},
+    "inLanguage": "zh-CN",
+    "author": {
+      "@type": "Person",
+      "name": {{ page.author_name | jsonify }},
+      "url": {{ page.author_url | jsonify }}
+    }{% if page.date %},
+    "datePublished": {{ page.date | date_to_xmlschema | jsonify }}{% endif %}
+  }
+  </script>
+  {% endif %}
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
